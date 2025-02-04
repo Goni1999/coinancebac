@@ -1,0 +1,141 @@
+// src/components/InvestmentForm.scss
+$primary-color: #FFD700;
+$secondary-color: black;
+$button-hover-color: silver;
+
+.form-container {
+  display: flex;
+  justify-content: flex-start;  
+  gap: 50px;
+  padding: 20px;
+}
+
+.investment-form {
+  width: 30%; /* Reduced size by 80% */
+  padding: 15px;
+  background: #0f172a;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;  /* Center the form */
+  height: auto;  /* Adjust form height to content */
+  
+  h2 {
+    text-align: center;
+    color: $primary-color;
+    margin-bottom: 15px;  /* Reduced margin for a shorter form */
+  }
+
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  label {
+    display: block;
+    font-size: 14px;
+    color: white;
+    margin-bottom: 5px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 8px;  /* Reduced padding to shorten height */
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+
+  .phone-input {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+
+    select {
+      width: 30%;
+    }
+
+    input {
+      width: 65%;
+    }
+  }
+
+  textarea {
+    height: 70px;  
+  }
+
+  .invest-button {
+    width: 100%;
+    padding: 10px;  
+    font-size: 16px;
+    background: $primary-color;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 10px;  
+
+    &:hover {
+      background: $button-hover-color;
+    }
+  }
+}
+
+.info-panel {
+  width: 35%; /* New panel to the right */
+  padding: 20px;
+  background: #0f172a;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+  ul li{
+    color: white;
+  }
+
+  ol li{
+    color: white;
+  }
+  
+  h1 {
+    margin-bottom: 10px;
+    color: #FFD700;
+  }
+  h2{
+    color: white;
+  }
+  p {
+    font-size: 16px;
+    color: white;
+  }
+}
+
+.investment-amount-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.investment-amount-container button {
+  padding: 10px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.investment-amount-container button:hover {
+  background-color: black;
+  
+}
+
+.investment-amount-container input {
+  width: 200px;
+  padding: 10px;
+  font-size: 16px;
+  text-align: center;
+}
+

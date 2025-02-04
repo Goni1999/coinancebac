@@ -1,0 +1,98 @@
+.crypto-portfolio {
+    padding: 2rem;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  
+    .portfolio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+  
+      button {
+        padding: 8px 16px;
+        background: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+  
+        &:hover {
+          background: #1976D2;
+        }
+      }
+    }
+  
+    .chart-container {
+      max-width: 300px;
+      margin: 0 auto 2rem;
+    }
+  
+    .edit-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+  
+      .input-group {
+        display: flex;
+        flex-direction: column;
+  
+        label {
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+        }
+  
+        input {
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        }
+      }
+  
+      button {
+        grid-column: 1 / -1;
+        padding: 12px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    }
+  
+    .portfolio-summary {
+      h3 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+      }
+  
+      .crypto-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+  
+        .crypto-item {
+          padding: 1rem;
+          background: #f8f9fa;
+          border-radius: 8px;
+          display: flex;
+          justify-content: space-between;
+  
+          span {
+            &:first-child { font-weight: 600; }
+            &:nth-child(2) { color: #666; }
+            &:last-child { color: #2196F3; }
+          }
+        }
+      }
+    }
+  
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+  }

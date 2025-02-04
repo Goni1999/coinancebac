@@ -1,0 +1,72 @@
+.recent-transactions {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #171F2A;
+    border: 0.1px solid #151515;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: "Arial", sans-serif;
+    margin-left: 0%;
+  
+    .title {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 20px;
+    }
+  
+    .transaction-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+  
+    .transaction-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      background: #171F2a;
+      border: 0.1px solid #151515;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+  
+      .currency-logo {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+  
+      .transaction-details {
+        flex: 1;
+        margin-left: 15px;
+  
+        .currency-name {
+          font-size: 1.2rem;
+          font-weight: bold;
+          color: white;
+        }
+  
+        .transaction-time {
+          font-size: 0.9rem;
+          color: white;
+        }
+      }
+  
+      .transaction-amount {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #00c853;
+      }
+    }
+  }
+  

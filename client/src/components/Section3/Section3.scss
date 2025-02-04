@@ -1,0 +1,60 @@
+.section3 {
+    padding: 40px;
+    text-align: center;
+  
+    h3 {
+      font-size: 24px;
+      color: black;
+      margin-bottom: 30px;
+    }
+  
+    .processes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+  
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr; /* Stack cards on smaller screens */
+      }
+    }
+  
+    .process-card {
+      background: #e6e6e6;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+  
+      .process-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 15px auto;
+  
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+  
+      h4 {
+        font-size: 18px;
+        color: #007bff;
+        margin-bottom: 10px;
+      }
+  
+      p {
+        font-size: 14px;
+        color: #555;
+      }
+  
+      &:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+      }
+    }
+  }
+  

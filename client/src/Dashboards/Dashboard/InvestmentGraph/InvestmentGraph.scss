@@ -1,0 +1,39 @@
+.investment-graph {
+  max-width: 400px;
+  padding: 20px;
+  background: #131720;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: "Arial", sans-serif;
+  color: white;
+
+
+  .title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: rgb(170, 169, 169);
+    margin-bottom: 20px;
+  }
+
+  .chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .details {
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.6;
+
+    p {
+      margin: 5px 0;
+    }
+
+    strong {
+      color: #00c853;
+    }
+  }
+}

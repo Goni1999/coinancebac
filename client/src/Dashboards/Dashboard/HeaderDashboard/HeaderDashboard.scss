@@ -1,0 +1,93 @@
+.header-dashboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #212B39;
+  color: white;
+  position: sticky;
+  top: 0; /* Makes the header stick to the top during scrolling */
+  z-index: 100;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    h2{
+      font-size: 26px;
+      color: white;
+    }
+
+    .logo {
+      height: 130px;
+      width: 200px;
+      margin-left: 20px;
+      cursor: pointer;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .notification-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+
+      .bell-icon {
+        height: 32px;
+      }
+    }
+
+    .dropdown {
+      position: relative;
+
+      .welcome-text {
+        margin-right: 10px;
+        font-weight: bold;
+        font-size: 22px;
+      }
+
+      .dropdown-button {
+        background: none;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: red;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid black;
+        border-radius: 15px;
+        z-index: 10;
+        display: none;
+        flex-direction: column;
+
+        button {
+          padding: 10px;
+          border: none;
+          background: none;
+          text-align: left;
+          cursor: pointer;
+
+          &:hover {
+            background-color: darkred;
+            border-radius: 15px;
+          }
+        }
+      }
+
+      &:hover .dropdown-menu {
+        display: flex;
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+// Exchange.scss
+
+.exchange-container {
+    background-color: #171F2A;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .exchange-content {
+    width: 80%;
+    margin-left: 20%;
+    padding: 20px;
+  }
+  
+  .trade-card {
+    background-color: #171F2A;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    color: white;
+    margin: 20px auto;
+  }
+  
+  .trade-card-title {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+  }
+  
+  .trade-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .trade-card-row label {
+    font-size: 16px;
+    font-weight: bold;
+    flex: 1;
+  }
+  
+  .trade-card-row select,
+  .trade-card-row input {
+    flex: 2;
+    padding: 10px;
+    font-size: 14px;
+    background: black;
+    color: white;
+    border: 1px solid #2c3e50;
+    border-radius: 5px;
+  }
+  
+  .trade-button {
+    width: 100%;
+    padding: 12px;
+    background: #f0b90b;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .trade-button:hover {
+    background: #e6a908;
+  }
+  
+  .no-data {
+    color: white;
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 10px;
+  }
+  

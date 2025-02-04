@@ -1,0 +1,78 @@
+.crypto-card-1 {
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 14px 0;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #171f2a;
+    color: white;
+  
+    .top-section-1 {
+      .header-1 {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+  
+        .coin-logo-1 {
+          width: 50px;
+          height: 50px;
+          margin-right: 16px;
+        }
+  
+        .coin-info-1 {
+          h3 {
+            margin: 0;
+            font-size: 25px;
+          }
+  
+          .coin-dropdown-1 {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: black;
+            color: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+          }
+        }
+      }
+  
+      .price-details-1 {
+        p {
+          font-size: 20px;
+          margin: 8px 0;
+        }
+  
+        .positive-1 {
+          color: green;
+        }
+  
+        .negative-1 {
+          color: red;
+        }
+      }
+    }
+  
+    .bottom-section-1 {
+      display: flex;
+      justify-content: space-around;
+      gap: 570px;
+  
+      .column-1 {
+        p {
+          margin: 8px 0;
+  
+          .arrow {
+            &.up {
+              color: green;
+            }
+  
+            &.down {
+              color: red;
+            }
+          }
+        }
+      }
+    }
+  }
+  

@@ -1,0 +1,69 @@
+.crypto-cards-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    background-color: #131720; // Dark background for the container
+  }
+  
+  .crypto-card {
+    width: 300px; // Card length
+    height: 120px; // Card height
+    background-color: #171f2a; // Dark card background
+    color: #fff; // White text color
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 17px;
+      font-weight: 600;
+  
+      .coin-name {
+        text-align: left;
+      }
+  
+      .coin-price {
+        text-align: right;
+      }
+    }
+  
+    .card-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+  
+      .coin-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #292929; // Placeholder color for logos
+        margin-right: 10px;
+      }
+  
+      canvas {
+        width: 200px !important; // Restrict graph width inside the card
+        height: 90px !important; // Restrict graph height inside the card
+      }
+    }
+  }
+  
+  // Ensure the cards are responsive on smaller screens
+  @media (max-width: 768px) {
+    .crypto-cards-container {
+      justify-content: center;
+    }
+  
+    .crypto-card {
+      width: 200px;
+      height: 80px;
+    }
+  }
+  

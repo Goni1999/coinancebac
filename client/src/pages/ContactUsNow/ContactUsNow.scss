@@ -1,0 +1,92 @@
+.contact-us-now {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: 16px;
+  background-color: #EBECF0;
+  text-align: center;
+  margin-top: 70px;
+  box-shadow: -5px -5px 0px #FFF, 5px 5px 0px #BABECC;
+  position: relative;
+
+  .contact-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+
+    .company-logo {
+      width: 300px;
+      height: 200px;
+      margin-right: 16px;
+      border-radius: 8px;
+    }
+
+    
+  }
+
+  h4 {
+    font-size: 33px;
+    margin-bottom: 32px;
+    color: rgb(15, 44, 129);
+    text-shadow: 1px 1px 1px #FFF;
+    font-family: roboto;
+  }
+
+  .enquiry-form {
+    padding: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+
+    label {
+      display: block;
+      margin-bottom: 14px;
+      font-weight: bold;
+      width: 30%;
+      color: #80869b;
+      text-shadow: 1px 1px 1px #FFF;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 80%;
+      padding: 16px;
+      border: 0;
+      border-radius: 320px;
+      box-shadow: inset 2px 2px 5px #BABECC, inset -5px -5px 10px #FFF;
+      font-size: 16px;
+      background-color: #EBECF0;
+      transition: all 0.2s ease-in-out;
+
+      &:focus {
+        box-shadow: inset 1px 1px 2px #BABECC, inset -1px -1px 2px #FFF;
+      }
+    }
+
+    button {
+      padding: 16px;
+      margin: 7px auto;
+      border: 0.2px solid blue;
+      border-radius: 320px;
+      background-color: #EBECF0;
+      color: #61677C;
+      font-weight: 600;
+      box-shadow: -5px -5px 20px #FFF, 5px 5px 20px #3c3e44;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+
+      &:hover {
+        box-shadow: -2px -2px 5px #FFF, 2px 2px 5px #BABECC;
+        background-color: black;
+        color: white;
+      }
+
+      &:active {
+        box-shadow: inset 1px 1px 2px #BABECC, inset -1px -1px 2px #FFF;
+      }
+    }
+  }
+}

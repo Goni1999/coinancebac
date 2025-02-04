@@ -1,0 +1,117 @@
+.dashboard {
+  display: flex;
+  height: 100vh;
+  background-color: #131720;
+  
+  .dashboard-header {
+    position: fixed;
+    top: 0;
+    left: 23%;
+    right: 0;
+    background-color: #131720;
+    height: 70px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    padding: 0 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+
+      .logo {
+        height: 50px;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+
+      .notification-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        margin-right: 15px;
+        cursor: pointer;
+        color: #333;
+
+        a {
+          text-decoration: none;
+          color: inherit;
+        }
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+
+        .user-circle {
+          width: 40px;
+          height: 40px;
+          background-color: #007bff;
+          color: #fff;
+          font-size: 20px;
+          font-weight: bold;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-right: 10px;
+        }
+
+        .user-name {
+          font-size: 20px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 23%;
+    height: 100%;
+    background-color: #1c1c1c;
+    color: #fff;
+    padding-top: 70px;
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        color: #fff;
+        text-decoration: none;
+        margin-bottom: 20px;
+        padding: 10px;
+        border-radius: 5px;
+
+        &:hover {
+          background-color: #333;
+        }
+
+        .icon {
+          margin-right: 10px;
+        }
+
+        &.log-off {
+          color: #e74c3c;
+        }
+      }
+    }
+  }
+
+
+}
+
+.main{
+  background-color: #131720;
+}

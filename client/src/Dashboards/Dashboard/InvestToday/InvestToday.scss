@@ -1,0 +1,51 @@
+$dark-bg: #171F2A;
+$yellow-btn: #F0B90B;
+$white-text: #ffffff;
+$button-hover: darken($yellow-btn, 10%);
+
+.invest-card {
+  max-width: 300px;  
+  background-color: $dark-bg;
+  padding: 2rem;
+  border-radius: 10px;
+  margin: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+
+  &__title {
+    color: $white-text;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+  }
+
+  &__button {
+    background-color: $yellow-btn;
+    color: $white-text;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $button-hover;
+    }
+  }
+
+  &__website {
+    color: $white-text;
+    margin-left: 10px;
+  }
+}

@@ -1,0 +1,253 @@
+// General Navbar Styles
+.navbar {
+  font-family: "Lato", serif;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #F9F9EE;
+  padding: 0px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  color: black;
+  transition: all 0.3s ease-in-out; 
+
+  &.dark-mode {
+    background-color: black;
+    color: white;
+
+    .navbar-item{
+      border-bottom: 0.1px solid white;
+
+    }
+
+    .navbar-logo a,
+    .navbar-links a,
+    .auth-button,
+    .theme-toggle {
+      color: white;
+
+    }
+
+    .dropdown-menu {
+      background-color: #2b2b2b;
+      color: #f5f5f5;
+      border: 1px solid #444;
+
+      button:hover {
+        background-color: #444;
+      }
+    }
+
+    .report-button {
+      background-color: black;
+    }
+  }
+
+  .navbar-logo {
+    font-size: 0px;
+    font-weight: bold;
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+
+  .navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+    margin-right: 28px;
+
+    
+
+    .navbar-item a {
+      text-decoration: none;
+      color: inherit;
+      font-size: 16px;
+      padding: 5px 15px;
+      border-bottom: 0.1px solid black;
+      transition: color 0.3s ease;
+
+      &:hover{
+        background-color: black;
+        color: white;
+        transition: 0.2s ease-in;
+      }
+      
+    }
+  }
+}
+
+// Authentication Buttons
+.auth-buttons {
+  display: flex;
+  gap: 15px;
+
+  .auth-button {
+    background: none;
+    border: 0.5px solid rgba(0, 0, 0, 0.5) ;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: royalblue;
+
+    &:hover {
+      color: white;
+    }
+
+    &.theme-toggle {
+      border: none;
+      background: none;
+
+      &:hover {
+        color: white;
+      }
+    }
+  }
+
+  // Dark Mode Buttons
+  &.dark-mode {
+    .auth-button {
+      border: 1px solid #f5f5f5;
+      color: #f5f5f5;
+
+      &:hover {
+        background-color: #ffd700;
+        color: #1e1e1e;
+      }
+    }
+  }
+}
+
+// User Dropdown
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+
+  span {
+    cursor: pointer;
+    font-weight: bold;
+    color: inherit;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background-color: white;
+    border: 1px solid lightgray;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    min-width: 120px;
+    z-index: 999;
+
+    button {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 10px;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f0f0f0;
+      }
+    }
+  }
+
+  &.dark-mode .dropdown-menu {
+    background-color: #2b2b2b;
+    border: 1px solid #444;
+
+    button:hover {
+      background-color: #444;
+    }
+  }
+}
+
+// Report Button
+.report-button {
+  border: none;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: #111;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid white;
+
+  &:hover {
+    color: royalblue;
+    border: 1px solid royalblue;
+  }
+
+  &:focus {
+    animation: pulse 1s infinite;
+  }
+
+  &.dark-mode {
+    color: #f5f5f5;
+    border-bottom: 0.1 solid white;
+
+    &:hover {
+      background-color: #444;
+    }
+  }
+}
+
+body.dark-mode {
+  background-color: #0C0F0A;
+  color: #f5f5f5;
+  transition: all 0.3s ease;
+
+  a {
+    color: #ffd700;
+  }
+
+  h2 {
+    color: whitesmoke;
+  }
+
+  h3 {
+    color: whitesmoke;
+  }
+}
+
+.img-logo {
+  width: 230px;
+  height: 130px;
+  margin: 0;
+}
+
+.modal-overlay .modal-content {
+  .remember-me {
+    color: black; 
+  }
+
+  a {
+    color: blue; /* Or any static color you prefer */
+    text-decoration: underline;
+
+    &:hover {
+      color: darkblue; /* Optional hover color */
+    }
+  }
+
+  /* Ensure these styles don't change in dark mode */
+  body.dark-mode & {
+    .remember-me {
+      color: black; /* Keep static color in dark mode */
+    }
+
+    a {
+      color: blue;
+    }
+  }
+}

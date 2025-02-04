@@ -1,0 +1,87 @@
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2ecc71;
+$error-color: #e74c3c;
+$background-color: #f4f4f4;
+$text-color: #333;
+$border-color: #ddd;
+$table-header-bg: #34495e;
+$table-header-color: #fff;
+$table-row-hover: #f9f9f9;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin table-styles {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+
+  thead tr {
+    background-color: $table-header-bg;
+    color: $table-header-color;
+    text-align: left;
+  }
+
+  th, td {
+    padding: 12px 15px;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid $border-color;
+  }
+
+  tbody tr:nth-of-type(even) {
+    background-color: $table-row-hover;
+  }
+
+  tbody tr:last-of-type {
+    border-bottom: 2px solid $table-header-bg;
+  }
+
+  tbody tr:hover {
+    background-color: darken($table-row-hover, 5%);
+  }
+}
+
+// Base Styles
+.admin-dashboard {
+  padding: 20px;
+  background-color: $background-color;
+  color: $text-color;
+  font-family: 'Arial', sans-serif;
+
+  h1, h2 {
+    color: $primary-color;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 2.5em;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 1.8em;
+    margin-top: 30px;
+  }
+
+  // Tables
+  table {
+    @include table-styles;
+  }
+
+  // No Data Found Message
+  .no-data {
+    text-align: center;
+    color: $error-color;
+    font-style: italic;
+  }
+}

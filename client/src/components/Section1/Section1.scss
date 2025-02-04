@@ -1,0 +1,36 @@
+.section1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 100px;
+    border-radius: 10px;
+    margin: 1px auto;
+    color: black;
+
+    .section1-image {
+      flex: 1;
+      img {
+        width: 100%;
+        max-width: 400px;
+        border-radius: 12px;
+      }
+    }
+  
+    .section1-content {
+      flex: 2;
+      margin-left: 10px;
+  
+      h2 {
+        margin-bottom: 15px;
+      }
+  
+      p {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
+  
+      
+    }
+  }
+  
