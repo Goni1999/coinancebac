@@ -31,7 +31,7 @@ const db = new Client({
 
 // Middleware
 app.use(cors({
-    origin: 'https://your-react-app.vercel.app', // Update with your frontend URL
+    origin: 'https://elegant-palmier-4bde1a.netlify.app/', // Update with your frontend URL
     methods: ['GET', 'POST', 'PUT'],
     credentials: true
 }));
