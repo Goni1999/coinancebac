@@ -1,16 +1,24 @@
-export default async function handler(req, res) {
-  // Set CORS headers to allow cross-origin requests
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+import express from 'express';
+import cors from 'cors';
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // Handle preflight request
-  }
+const app = express();
+const port = process.env.PORT || 5000;
 
-  if (req.method === 'GET') {
-    return res.status(200).json({ message: 'Server is connected' });
-  }
+// Enable CORS for requests from Netlify
+const corsOptions = {
+  origin: 'https://reactfrontend-de123.netlify.app', // Your Netlify frontend domain
+  methods: ['GET', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+};
 
-  res.status(405).json({ message: 'Method Not Allowed' });
-}
+// Use CORS middleware
+app.use(cors(corsOptions));
+
+// Add Cache-Control to prevent caching
+app.get('/api/status', (req, res) => {
+  res.set('Cache-Control', 'no-store'); // Disable caching to prevent 304 responses
+  res.status(200).json({ message: 'Server is connected' });
+});
+
+// Export the function as a serverless handler for Vercel
+export default app;

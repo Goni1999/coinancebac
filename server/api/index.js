@@ -3,53 +3,58 @@ import cors from 'cors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pkg from 'pg';
-
 import dotenv from 'dotenv';
-dotenv.config();
 
+dotenv.config();
+const port = process.env.PORT || 5000;
 
 const { Client } = pkg;
 
 const app = express();
 
-// Check for environment variables, these will be injected in Vercel
+// Ensure SECRET_KEY exists in .env
 if (!process.env.SECRET_KEY) {
     throw new Error("FATAL ERROR: SECRET_KEY is missing");
 }
 
-const PORT = process.env.PORT || 3001;
+// Fetch environment variables
 const SECRET_KEY = process.env.SECRET_KEY; 
 
-// Database connection using Vercel's environment variables
+// Database connection using Neon PostgreSQL URL from .env
 const db = new Client({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'postgres', // Change to your PostgreSQL username
-    password: process.env.DB_PASSWORD || '', // Change to your PostgreSQL password
-    database: process.env.DB_NAME || 'user_auth', // Change to your PostgreSQL database name
-    port: 5432 // Default PostgreSQL port
+    connectionString: process.env.DATABASE_URL, // Use DATABASE_URL from .env
+    ssl: {
+        rejectUnauthorized: false, // Necessary for SSL connections with Neon
+    },
 });
 
-// Middleware
-app.use(cors({
-    origin: 'https://elegant-palmier-4bde1a.netlify.app/', // Update with your frontend URL
-    methods: ['GET', 'POST', 'PUT'],
-    credentials: true
-}));
+const corsOptions = {
+    origin: 'https://reactfrontend-de123.netlify.app', // Your Netlify frontend domain
+    methods: ['GET', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+  };
 app.use(express.json());
 
-const connectDB = () => {
-    db.connect(err => {
-        if (err) {
-            console.error('Error connecting to PostgreSQL:', err);
-            setTimeout(connectDB, 5000); // Retry after 5 seconds
-        } else {
-            console.log('✅ Connected to PostgreSQL');
-        }
-    });
+// Connect to the PostgreSQL database
+const connectDB = async () => {
+    try {
+        await db.connect(); // Connect to the Neon PostgreSQL DB
+        console.log('✅ Connected to PostgreSQL');
+    } catch (err) {
+        console.error('Error connecting to PostgreSQL:', err);
+        setTimeout(connectDB, 5000); // Retry after 5 seconds
+    }
 };
 
 connectDB();
 
+app.use(cors(corsOptions));
+
+// Add Cache-Control to prevent caching
+app.get('/api/status', (req, res) => {
+  res.set('Cache-Control', 'no-store'); // Disable caching to prevent 304 responses
+  res.status(200).json({ message: 'Server is connected' });
+});
 // Token Generation
 const generateToken = (user) => {
     return jwt.sign(
@@ -411,4 +416,4 @@ app.put('/api/update-total/:id', authenticateJWT, (req, res) => {
     });
 });
 
-app.listen(5000, console.log("Server listening in port 5000"));
+export default app;

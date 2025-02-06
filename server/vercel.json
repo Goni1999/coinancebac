@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/api/status.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/status",
-      "dest": "server/api/status.js"
+      "src": "/api/index",
+      "dest": "/api/index.js"
     }
   ]
 }
