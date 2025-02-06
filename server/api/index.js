@@ -48,10 +48,38 @@ const connectDB = async () => {
 
 connectDB();
 
+
+app.get('/api/test-db-connection', async (req, res) => {
+    try {
+      // Attempt to connect to the database
+      console.log('✅ Connected to PostgreSQL');
+  
+      // Test the connection with a simple query, like SELECT NOW() or SELECT version()
+      const result = await db.query('SELECT NOW()');
+      
+      // Send success response with timestamp
+      res.status(200).json({
+        message: 'Database connection successful',
+        timestamp: result.rows[0].now, // Current timestamp from the database
+      });
+    } catch (err) {
+      console.error('Error connecting to PostgreSQL:', err);
+      
+      // Send error response if the connection fails
+      res.status(500).json({
+        message: 'Error connecting to database',
+        error: err.message,
+      });
+    } finally {
+      // Close the database connection
+      await db.end();
+    }
+  });
+
 app.use(cors(corsOptions));
 
 // Add Cache-Control to prevent caching
-app.get('/api/status', (req, res) => {
+app.get('/api/index', (req, res) => {
   res.set('Cache-Control', 'no-store'); // Disable caching to prevent 304 responses
   res.status(200).json({ message: 'Server is connected' });
 });
@@ -307,6 +335,10 @@ app.get('/api/investments', authenticateJWT, checkRole('admin'), (req, res) => {
             return res.status(500).send({ error: 'Database error' });
         }
         res.send(results);
+        res.status(200).json({
+            message: 'Successfully fetched all investments',
+            data: results // The data will be in the "data" field as JSON
+        });
     });
 });
 
@@ -390,6 +422,30 @@ app.get('/api/users/:id', authenticateJWT, (req, res) => {
         res.json(results[0]); // Return user balances
     });
 });
+
+app.get('/api/userss1', (req, res) => {
+    console.log("🔍 Fetching all users..."); // ✅ Debugging Log
+
+    const query = `SELECT id, name, email, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total FROM users`;
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('❌ Database error:', err);
+            return res.status(500).send({ error: 'Database error' });
+        }
+
+        if (result.rows.length === 0) {
+            console.warn("⚠️ No users found in the database"); // ✅ Debugging Log
+            return res.status(404).json({ error: 'No users found' });
+        }
+
+        // Extract only the rows containing the user data
+        const users = result.rows;
+
+        console.log("✅ Fetched users:", users); // ✅ Debugging Log
+        res.json(users); // Return only user data
+    });
+});
+
 
 // ✅ Update User's Total Balance in `users` Table
 app.put('/api/update-total/:id', authenticateJWT, (req, res) => {
