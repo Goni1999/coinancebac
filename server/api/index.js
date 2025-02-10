@@ -29,10 +29,12 @@ const db = new Client({
 });
 
 const corsOptions = {
-    origin: 'https://reactfrontend-de123.netlify.app', // Your Netlify frontend domain
-    methods: ['GET', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
+    origin: 'https://reactfrontend-de123.netlify.app',  // Allow the frontend origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allow specific HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'],  // Allow Authorization header
   };
+  app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // Connect to the PostgreSQL database
@@ -76,7 +78,6 @@ app.get('/api/test-db-connection', async (req, res) => {
     }
   });
 
-app.use(cors(corsOptions));
 
 // Add Cache-Control to prevent caching
 app.get('/api/index', (req, res) => {
@@ -85,12 +86,19 @@ app.get('/api/index', (req, res) => {
 });
 // Token Generation
 const generateToken = (user) => {
+    if (!user) {
+        throw new Error('User object is undefined');
+    }
+
+    // Validate and default missing fields (to avoid undefined errors)
+    const role = user.role ? user.role.trim().toLowerCase() : 'user';  // Default role to 'user' if not available
+
     return jwt.sign(
         {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role.trim().toLowerCase(),
+            role: role,
             balances: {
                 BTC: user.BTC || 0,
                 ETH: user.ETH || 0,
@@ -103,80 +111,97 @@ const generateToken = (user) => {
                 total: user.total || 0,
             },
         },
-        SECRET_KEY,
+        process.env.SECRET_KEY,
         { expiresIn: '1h' }
     );
 };
 
 // JWT Authentication Middleware
 const authenticateJWT = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: 'Unauthorized: No token provided' });
+    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from 'Authorization' header
 
-    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).send({ error: 'Unauthorized: No token provided' }); // Token is missing
+    }
 
-    jwt.verify(token, SECRET_KEY, (err, user) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
         if (err) {
-            console.log("🚨 JWT Verification Failed:", err.message);
-            return res.status(403).json({ error: 'Forbidden: Invalid token' });
+            return res.status(403).send({ error: 'Unauthorized: Invalid or expired token' }); // Invalid token
         }
 
-        console.log("✅ Decoded JWT Payload:", user);
-        req.user = user;
-        next();
+        req.user = user; // Attach user to request object
+        next(); // Proceed to the next middleware or route handler
     });
 };
 
-// Role Verification Middleware
 const checkRole = (requiredRole) => {
     return (req, res, next) => {
+        // Log for debugging role check
         console.log(`Checking Role - Required: '${requiredRole}', User Role: '${req.user?.role}'`);
-        if (!req.user || !req.user.role) return res.status(403).json({ error: 'Forbidden: No role found' });
 
-        if (req.user.role.trim().toLowerCase() !== requiredRole.trim().toLowerCase()) {
+        // Ensure that the user object exists and contains a role
+        if (!req.user) {
+            console.log("🚨 No user found in request");
+            return res.status(403).json({ error: 'Forbidden: User not authenticated' });
+        }
+
+        // Check if role is present in user object
+        if (!req.user.role) {
+            console.log("🚨 No role found in user object");
+            return res.status(403).json({ error: 'Forbidden: No role found' });
+        }
+
+        // Check if user's role matches required role
+        const userRole = req.user.role.trim().toLowerCase();
+        const requiredRoleTrimmed = requiredRole.trim().toLowerCase();
+
+        if (userRole !== requiredRoleTrimmed) {
             console.log(`🚨 Role mismatch - Blocking access! (User Role: '${req.user.role}')`);
-            return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+            return res.status(403).json({ error: `Forbidden: Insufficient permissions for '${requiredRole}'` });
         }
 
         console.log("✅ Role check passed - Access granted!");
-        next();
+        next(); // Continue to next middleware or route handler
     };
 };
 
+
+
+
+// this is the fixed part of code for register, make the changes in others part of code to work properly as this one 
 app.post('/auth/register', async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             error: 'All fields are required',
             missing: ['name', 'email', 'password'].filter(f => !req.body[f])
         });
     }
 
     try {
+        // Hash the password using bcrypt
         const hashedPassword = await bcrypt.hash(password, 10);
-        const query = 'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)';
+        // Create the query to insert a new user
+        const query = 'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id';
+        
+        // Use async/await with db.query() for better result handling
+        const result = await db.query(query, [name, email, hashedPassword, 'user']);
 
-        db.query(query, [name, email, hashedPassword, "user"], (err, results) => {
-            if (err) {
-                if (err.code === '23505') { // PostgreSQL error for unique constraint violation (duplicate email)
-                    return res.status(409).json({
-                        error: 'Email already registered',
-                        code: 'EMAIL_EXISTS'
-                    });
-                }
-                console.error("❌ Database error:", err);
-                return res.status(500).json({ 
-                    error: 'Registration failed',
-                    code: 'DB_ERROR'
-                });
-            }
-
-            res.status(201).json({
+        // Check if the result is valid and return a response
+        if (result.rows.length > 0) {
+            const userId = result.rows[0].id; // Get the inserted user id
+            return res.status(201).json({
                 message: 'Registration successful',
-                userId: results.rows[0].id, // PostgreSQL result format
+                userId: userId,
                 nextStep: '/auth/login'
             });
+        }
+
+        // If for any reason the insertion didn't work as expected
+        return res.status(500).json({
+            error: 'Registration failed',
+            code: 'DB_ERROR'
         });
     } catch (err) {
         console.error("❌ Registration error:", err);
@@ -186,6 +211,7 @@ app.post('/auth/register', async (req, res) => {
         });
     }
 });
+
 
 
 // ✅ Debugging Log to Check All Registered Routes
@@ -240,68 +266,148 @@ app.post('/api/contact', (req, res) => {
 });
 
 
-// ✅ Login Route (Now includes balances in JWT)
 app.post('/auth/login', (req, res) => {
     const { email, password } = req.body;
 
-    if (!email || !password) return res.status(400).send({ error: 'All fields are required' });
+    if (!email || !password) {
+        return res.status(400).send({ error: 'All fields are required' });
+    }
 
-    const query = 'SELECT * FROM users WHERE email = ?';
+    const query = 'SELECT * FROM users WHERE email = $1';  // Use parameterized query for security
     db.query(query, [email], async (err, results) => {
-        if (err) return res.status(500).send({ error: 'Database error' });
-        if (results.length === 0) return res.status(404).send({ error: 'Invalid email or password' });
+        if (err) {
+            return res.status(500).send({ error: 'Database error' });
+        }
 
-        const user = results[0];
+        if (results.rows.length === 0) {
+            return res.status(404).send({ error: 'Invalid email or password' });
+        }
+
+        const user = results.rows[0];  // Get the user object from results
+
+        // Verify the password
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) return res.status(401).send({ error: 'Invalid email or password' });
+        if (!isPasswordValid) {
+            return res.status(401).send({ error: 'Invalid email or password' });
+        }
 
-        const token = generateToken(user);
+        // Generate JWT token after password validation
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role.trim().toLowerCase(),
+                balances: {
+                    BTC: user.BTC || 0,
+                    ETH: user.ETH || 0,
+                    ADA: user.ADA || 0,
+                    XRP: user.XRP || 0,
+                    DOGE: user.DOGE || 0,
+                    BNB: user.BNB || 0,
+                    SOL: user.SOL || 0,
+                    DOT: user.DOT || 0,
+                    total: user.total || 0,
+                },
+            },
+            process.env.SECRET_KEY,  // Use the secret key from your environment
+            { expiresIn: '1h' }  // Token expiration time (1 hour in this case)
+        );
+
+        // Send response with user data and token
         res.send({ message: 'Login successful', user, token });
     });
 });
 
+
+
+
 // ✅ Get All Users (Admin Only)
-app.get('/api/users', authenticateJWT, checkRole('admin'), (req, res) => {
+app.get('/api/users', authenticateJWT, checkRole('admin'), async (req, res) => {
     console.log("✅ Admin access granted to /api/users");
 
-    const query = 'SELECT id, name, email, role, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total FROM users';
-    db.query(query, (err, results) => {
-        if (err) return res.status(500).send({ error: 'Database error' });
-        res.send(results);
-    });
+    // Log user information (helpful for debugging)
+    console.log("✅ User info from JWT:", req.user);
+
+    const query = `
+        SELECT id, name, email, role, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total
+        FROM users;
+    `;
+
+    try {
+        // Execute the query using the db client
+        const { rows } = await db.query(query);  // Use db.query() instead of pool.query()
+
+        // If no results found, return an appropriate response
+        if (rows.length === 0) {
+            return res.status(404).send({ error: 'No users found' });
+        }
+
+        // Send the rows of the result as the response
+        res.status(200).send(rows);  // Access the rows property to get the actual data
+
+    } catch (err) {
+        // Log the error and send a 500 status code if there's a problem with the database query
+        console.error("❌ Database error:", err);
+        res.status(500).send({ error: 'Database error' });
+    }
 });
 
+
 // ✅ Get Reports (Admin Only)
-app.get('/api/reports', authenticateJWT, checkRole('admin'), (req, res) => {
+app.get('/api/reports', authenticateJWT, checkRole('admin'), async (req, res) => {
     console.log("✅ Admin access granted to /api/reports");
 
     const query = 'SELECT * FROM reports';
-    db.query(query, (err, results) => {
-        if (err) return res.status(500).send({ error: 'Database error' });
-        res.send(results);
-    });
+
+    try {
+        const { rows } = await db.query(query); // Using async/await with db.query
+        res.status(200).json({
+            message: 'Successfully fetched all reports',
+            data: rows, // Send results in 'data' field
+        });
+    } catch (err) {
+        console.error("❌ Database error:", err);
+        res.status(500).send({ error: 'Database error' });
+    }
 });
 
-// ✅ Update User Balances (Admin only)
-app.put('/api/users/:id', authenticateJWT, checkRole('admin'), (req, res) => {
+
+app.put('/api/users/:id', authenticateJWT, checkRole('admin'), async (req, res) => {
     const userId = req.params.id;
     const { BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total } = req.body;
 
+    // Validate that required fields are present
+    if (!BTC || !ETH || !ADA || !XRP || !DOGE || !BNB || !SOL || !DOT || !total) {
+        return res.status(400).json({ error: "All balance fields are required" });
+    }
+
     const query = `
         UPDATE users
-        SET BTC = ?, ETH = ?, ADA = ?, XRP = ?, DOGE = ?, BNB = ?, SOL = ?, DOT = ?, total = ?
-        WHERE id = ?
+        SET BTC = $1, ETH = $2, ADA = $3, XRP = $4, DOGE = $5, BNB = $6, SOL = $7, DOT = $8, total = $9
+        WHERE id = $10;  
     `;
 
-    db.query(query, [BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total, userId], (err, results) => {
-        if (err) return res.status(500).send({ error: 'Database error' });
-        if (results.affectedRows === 0) return res.status(404).send({ error: 'User not found' });
+    try {
+        const { rows } = await db.query(query, [BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total, userId]);
+        
+        if (rows.length === 0) {
+            return res.status(404).send({ error: 'User not found' });
+        }
 
-        res.send({ message: 'User updated successfully' });
-    });
+        res.status(200).json({
+            message: 'User updated successfully',
+            updatedUser: rows[0] // Return the updated user object if necessary
+        });
+    } catch (err) {
+        console.error("❌ Database error:", err);
+        res.status(500).send({ error: 'Database error' });
+    }
 });
 
-app.post('/api/investments', (req, res) => {
+
+// ✅ Post Investment
+app.post('/api/investments', async (req, res) => {
     const { first_name, last_name, phone_country_code, phone_number, email, investment_amount, details } = req.body;
 
     if (!first_name || !last_name || !phone_country_code || !phone_number || !email || !investment_amount) {
@@ -310,37 +416,45 @@ app.post('/api/investments', (req, res) => {
 
     const query = `
         INSERT INTO investments (first_name, last_name, phone_country_code, phone_number, email, investment_amount, details)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING *;  -- Optional: Return inserted row if you want
     `;
 
-    db.query(query, [first_name, last_name, phone_country_code, phone_number, email, investment_amount, details || ""], (err, result) => {
-        if (err) {
-            console.error("❌ Database error:", err);
-            return res.status(500).json({ error: "Database error" }); // ✅ Ensure JSON response
-        }
-        res.status(201).json({ message: "Investment submitted successfully!", investmentId: result.insertId });
-    });
+    try {
+        const { rows } = await db.query(query, [first_name, last_name, phone_country_code, phone_number, email, investment_amount, details || ""]);
+
+        res.status(201).json({
+            message: "Investment submitted successfully!",
+            investmentId: rows[0].id, // Return inserted investment ID (you can also return other details)
+        });
+    } catch (err) {
+        console.error("❌ Database error:", err);
+        res.status(500).json({ error: "Database error" });
+    }
 });
+
 
 
 
 // ✅ Get All Investments (Admin Only)
-app.get('/api/investments', authenticateJWT, checkRole('admin'), (req, res) => {
+app.get('/api/investments', authenticateJWT, checkRole('admin'), async (req, res) => {
     console.log("✅ Admin access granted to /api/investments");
 
     const query = 'SELECT * FROM investments';
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.status(500).send({ error: 'Database error' });
-        }
-        res.send(results);
+
+    try {
+        const { rows } = await db.query(query);
+
         res.status(200).json({
             message: 'Successfully fetched all investments',
-            data: results // The data will be in the "data" field as JSON
+            data: rows, // Send the data in a JSON object
         });
-    });
+    } catch (err) {
+        console.error('❌ Database error:', err);
+        res.status(500).send({ error: 'Database error' });
+    }
 });
+
 
 // ✅ Get All Contact Enquiries (Admin Only)
 app.get('/api/contact', authenticateJWT, checkRole('admin'), (req, res) => {
@@ -427,22 +541,19 @@ app.get('/api/userss1', (req, res) => {
     console.log("🔍 Fetching all users..."); // ✅ Debugging Log
 
     const query = `SELECT id, name, email, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total FROM users`;
-    db.query(query, (err, result) => {
+    db.query(query, (err, results) => {
         if (err) {
             console.error('❌ Database error:', err);
             return res.status(500).send({ error: 'Database error' });
         }
 
-        if (result.rows.length === 0) {
+        if (results.length === 0) {
             console.warn("⚠️ No users found in the database"); // ✅ Debugging Log
             return res.status(404).json({ error: 'No users found' });
         }
 
-        // Extract only the rows containing the user data
-        const users = result.rows;
-
-        console.log("✅ Fetched users:", users); // ✅ Debugging Log
-        res.json(users); // Return only user data
+        console.log("✅ Fetched all users:", results); // ✅ Debugging Log
+        res.json(results); // Return all users data
     });
 });
 
