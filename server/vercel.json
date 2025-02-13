@@ -4,6 +4,41 @@
     {
       "src": "api/index.js",
       "use": "@vercel/node"
+    },{
+      "src": "api/login.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/register.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/users.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/reports.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/contact.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/investments.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/update.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/trade.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/users1.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -12,8 +47,40 @@
       "dest": "/api/index.js"
     },
     {
+      "src": "/api/reports",
+      "dest": "/api/reports.js"
+    },
+    {
+      "src": "/api/contact",
+      "dest": "/api/contact.js"
+    },
+    {
+      "src": "/api/users",
+      "dest": "/api/users.js"
+    },
+    {
+      "src": "/api/investments",
+      "dest": "/api/investments.js"
+    },
+    {
+      "src": "/api/trade",
+      "dest": "/api/trade.js"
+    },
+    {
+      "src": "/api/update-total/:id",
+      "dest": "/api/update.js"
+    },
+    {
+      "src": "/api/userss",
+      "dest": "/api/users.js"
+    },
+    {
+      "src": "/api/update-balances",
+      "dest": "/api/update.js"
+    },
+    {
       "src": "/api/userss1",
-      "dest": "/api/index.js"
+      "dest": "/api/users.js"
     },
     {
       "src": "/api/test-db-connection",
@@ -21,27 +88,11 @@
     },
     {
       "src": "/auth/login",
-      "dest": "/api/index.js"
+      "dest": "/api/login.js"
     },
     {
       "src": "/auth/register",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/users",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/reports",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/investments",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/api/contact",
-      "dest": "/api/index.js"
+      "dest": "/api/register.js"
     }
   ]
 }
