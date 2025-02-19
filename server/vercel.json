@@ -93,6 +93,22 @@
     {
       "src": "/auth/register",
       "dest": "/api/register.js"
+    },
+    {
+      "src": "/auth/send-verification-email",
+      "dest": "/api/register.js"
+    },
+    {
+      "src": "/auth/upload-photo",
+      "dest": "/api/register.js"
+    },
+    {
+      "src": "/auth/verify-email",
+      "dest": "/api/register.js"
+    },
+    {
+      "src": "/auth/save-kyc",
+      "dest": "/api/register.js"
     }
   ]
 }

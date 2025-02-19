@@ -1,33 +1,253 @@
+import express from 'express';
+import cors from 'cors';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import pkg from 'pg';
-const { Client } = pkg;
-
 import dotenv from 'dotenv';
 
 dotenv.config();
 const port = process.env.PORT || 5000;
+
+const { Client } = pkg;
+
+const app = express();
+
+// Ensure SECRET_KEY exists in .env
+if (!process.env.SECRET_KEY) {
+    throw new Error("FATAL ERROR: SECRET_KEY is missing");
+}
+
+// Fetch environment variables
+const SECRET_KEY = process.env.SECRET_KEY; 
+
+// Database connection using Neon PostgreSQL URL from .env
 const db = new Client({
     connectionString: process.env.DATABASE_URL, // Use DATABASE_URL from .env
     ssl: {
         rejectUnauthorized: false, // Necessary for SSL connections with Neon
     },
 });
-connectDB();
 
-module.exports = async (req, res) => {
-    const id = 17; // Hardcoding the user ID to 17 for testing purposes
+const corsOptions = {
+    origin: 'https://capital-trust.eu', // Replace with your frontend domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
+  };
 
-    // Your database query or logic to fetch user data by `id`
+app.use(cors(corsOptions));
+
+app.use(express.json());
+
+// Connect to the PostgreSQL database
+const connectDB = async () => {
     try {
-        // Example: query the database using the hardcoded ID (17)
-        const userData = await db.query('SELECT * FROM users WHERE id = $1', [id]);
-
-        if (userData.rows.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        return res.status(200).json(userData.rows[0]);  // Return the user data as JSON
+        await db.connect(); // Connect to the Neon PostgreSQL DB
+        console.log('✅ Connected to PostgreSQL');
     } catch (err) {
-        console.error('Error fetching user:', err);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error connecting to PostgreSQL:', err);
+        setTimeout(connectDB, 5000); // Retry after 5 seconds
     }
 };
+
+connectDB();
+
+// JWT Authentication Middleware
+const authenticateJWT = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from 'Authorization' header
+
+    if (!token) {
+        return res.status(401).send({ error: 'Unauthorized: No token provided' }); // Token is missing
+    }
+
+    jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+        if (err) {
+            return res.status(403).send({ error: 'Unauthorized: Invalid or expired token' }); // Invalid token
+        }
+
+        req.user = user; // Attach user to request object
+        next(); // Proceed to the next middleware or route handler
+    });
+};
+
+const checkRole = (requiredRole) => {
+    return (req, res, next) => {
+        // Log for debugging role check
+        console.log(`Checking Role - Required: '${requiredRole}', User Role: '${req.user?.role}'`);
+
+        // Ensure that the user object exists and contains a role
+        if (!req.user) {
+            console.log("🚨 No user found in request");
+            return res.status(403).json({ error: 'Forbidden: User not authenticated' });
+        }
+
+        // Check if role is present in user object
+        if (!req.user.role) {
+            console.log("🚨 No role found in user object");
+            return res.status(403).json({ error: 'Forbidden: No role found' });
+        }
+
+        // Check if user's role matches required role
+        const userRole = req.user.role.trim().toLowerCase();
+        const requiredRoleTrimmed = requiredRole.trim().toLowerCase();
+
+        if (userRole !== requiredRoleTrimmed) {
+            console.log(`🚨 Role mismatch - Blocking access! (User Role: '${req.user.role}')`);
+            return res.status(403).json({ error: `Forbidden: Insufficient permissions for '${requiredRole}'` });
+        }
+
+        console.log("✅ Role check passed - Access granted!");
+        next(); // Continue to next middleware or route handler
+    };
+};
+
+
+// ✅ Get All Users (Admin Only)
+app.get('/api/users', authenticateJWT, checkRole('admin'), async (req, res) => {
+    console.log("✅ Admin access granted to /api/users");
+
+    // Log user information (helpful for debugging)
+    console.log("✅ User info from JWT:", req.user);
+
+    const query = `
+        SELECT id, name, email, role, btc, eth, ada, xrp, doge, bnb, sol, dot, total
+        FROM users;
+    `;
+
+    try {
+        // Execute the query using the db client
+        const { rows } = await db.query(query);  // Use db.query() instead of pool.query()
+
+        // If no results found, return an appropriate response
+        if (rows.length === 0) {
+            return res.status(404).send({ error: 'No users found' });
+        }
+
+        // Send the rows of the result as the response
+        res.status(200).send(rows);  // Access the rows property to get the actual data
+
+    } catch (err) {
+        // Log the error and send a 500 status code if there's a problem with the database query
+        console.error("❌ Database error:", err);
+        res.status(500).send({ error: 'Database error' });
+    }
+});
+{/*}
+app.get('/api/users1', authenticateJWT, async (req, res) => {
+    console.log("✅ Admin access granted to /api/users");
+
+    // Log user information (helpful for debugging)
+    console.log("✅ User info from JWT:", req.user);
+
+    const query = `
+        SELECT id, name, email, role, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total
+        FROM users;
+    `;
+
+    try {
+        // Execute the query using the db client
+        const { rows } = await db.query(query);  // Use db.query() instead of pool.query()
+
+        // If no results found, return an appropriate response
+        if (rows.length === 0) {
+            return res.status(404).send({ error: 'No users found' });
+        }
+
+        // Send the rows of the result as the response
+        res.status(200).send(rows);  // Access the rows property to get the actual data
+
+    } catch (err) {
+        // Log the error and send a 500 status code if there's a problem with the database query
+        console.error("❌ Database error:", err);
+        res.status(500).send({ error: 'Database error' });
+    }
+});
+
+
+
+app.put('/api/users', authenticateJWT, checkRole('admin'), async (req, res) => {
+    const { id, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total } = req.body; // Extract `id` from request body
+
+    // Validate that required fields are present
+    if (!id || !BTC || !ETH || !ADA || !XRP || !DOGE || !BNB || !SOL || !DOT || !total) {
+        return res.status(400).json({ error: "All balance fields and user ID are required" });
+    }
+
+    const query = `
+        UPDATE users
+        SET BTC = $1, ETH = $2, ADA = $3, XRP = $4, DOGE = $5, BNB = $6, SOL = $7, DOT = $8, total = $9
+        WHERE id = $10;  
+    `;
+
+    try {
+        const { rows } = await db.query(query, [BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total, id]); // Use `id` from request body
+        
+        if (rows.length === 0) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+
+        res.status(200).json({
+            message: 'User updated successfully',
+            updatedUser: rows[0] // Return the updated user object if necessary
+        });
+    } catch (err) {
+        console.error("❌ Database error:", err);
+        res.status(500).send({ error: 'Database error' });
+    }
+});
+*/}
+
+app.post('/api/userss', authenticateJWT, async (req, res) => {
+    const { id } = req.body; // Get the `id` from the request body
+    
+    console.log("🔍 Fetching user balances for ID:", id);
+  
+    const query = `
+        SELECT BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total 
+        FROM users 
+        WHERE id = $1
+    `;
+    
+    try {
+      // Execute the query to find user by the provided ID
+      const result = await db.query(query, [id]);
+  
+      // If no user found, return a 404 error
+      if (result.rows.length === 0) {
+        console.warn("⚠️ No user found for ID:", id);
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      // Return the user balances
+      console.log("✅ User Balances:", result.rows[0]);
+      return res.status(200).json(result.rows[0]);  // Send the data for the user
+    } catch (err) {
+      console.error('❌ Database error:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  
+
+  app.get('/api/userss1', (req, res) => {
+    console.log("🔍 Fetching all users..."); // ✅ Debugging Log
+
+    const query = `SELECT id, name, email, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total FROM users`;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('❌ Database error:', err);
+            return res.status(500).send({ error: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            console.warn("⚠️ No users found in the database"); // ✅ Debugging Log
+            return res.status(404).json({ error: 'No users found' });
+        }
+
+        console.log("✅ Fetched all users:", results); // ✅ Debugging Log
+        res.json(results); // Return all users data
+    });
+});
+
+
+export default app;
+

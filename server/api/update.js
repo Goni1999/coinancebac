@@ -30,7 +30,7 @@
   });
   
   const corsOptions = {
-      origin: 'https://reactfrontend-de12345.netlify.app', // Replace with your frontend domain
+      origin: 'https://capital-trust.eu', // Replace with your frontend domain
       methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
     };
@@ -102,36 +102,90 @@
   };
   
   
-  app.put('/api/update-balances', authenticateJWT, checkRole('admin'), async (req, res) => {
-    const { id, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total } = req.body; // Extract `id` from request body
+  app.post('/api/update-balances', authenticateJWT, checkRole('admin'), async (req, res) => {
+    const { users } = req.body;  // Receive array of users from frontend
 
-    // Validate that required fields are present
-    if (!id || !BTC || !ETH || !ADA || !XRP || !DOGE || !BNB || !SOL || !DOT || !total) {
-        return res.status(400).json({ error: "All balance fields and user ID are required" });
+    console.log("Received users data:", users);
+
+    if (!Array.isArray(users) || users.length === 0) {
+        return res.status(400).json({ error: 'Invalid user data provided' });
     }
-
-    const query = `
-        UPDATE users
-        SET BTC = $1, ETH = $2, ADA = $3, XRP = $4, DOGE = $5, BNB = $6, SOL = $7, DOT = $8, total = $9
-        WHERE id = $10;  
-    `;
 
     try {
-        const { rows } = await db.query(query, [BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total, id]); // Use `id` from request body
-        
-        if (rows.length === 0) {
-            return res.status(404).send({ error: 'User not found' });
+        await db.query('BEGIN');  // Start a database transaction
+
+        // Iterate over each user in the provided array
+        for (const user of users) {
+            const { userId, balances, total } = user;
+
+            // Prepare the dynamic SET clause and the values for the query
+            const setFields = [];
+            const values = [];
+
+            // Add fields to update based on the provided balances
+            if (balances.BTC !== undefined) {
+                setFields.push('BTC = $' + (setFields.length + 1));
+                values.push(balances.BTC);
+            }
+            if (balances.ETH !== undefined) {
+                setFields.push('ETH = $' + (setFields.length + 1));
+                values.push(balances.ETH);
+            }
+            if (balances.ADA !== undefined) {
+                setFields.push('ADA = $' + (setFields.length + 1));
+                values.push(balances.ADA);
+            }
+            if (balances.XRP !== undefined) {
+                setFields.push('XRP = $' + (setFields.length + 1));
+                values.push(balances.XRP);
+            }
+            if (balances.DOGE !== undefined) {
+                setFields.push('DOGE = $' + (setFields.length + 1));
+                values.push(balances.DOGE);
+            }
+            if (balances.BNB !== undefined) {
+                setFields.push('BNB = $' + (setFields.length + 1));
+                values.push(balances.BNB);
+            }
+            if (balances.SOL !== undefined) {
+                setFields.push('SOL = $' + (setFields.length + 1));
+                values.push(balances.SOL);
+            }
+            if (balances.DOT !== undefined) {
+                setFields.push('DOT = $' + (setFields.length + 1));
+                values.push(balances.DOT);
+            }
+
+            // Always update the total field
+            setFields.push('total = $' + (setFields.length + 1));
+            values.push(total);
+
+            // Add the user ID at the end of the values array (this is for the WHERE clause)
+            const userIdIndex = setFields.length + 1; // this will be the position of userId in the values array
+            values.push(userId);
+
+            // Build the full query dynamically
+            const updateQuery = `
+                UPDATE users
+                SET ${setFields.join(', ')}
+                WHERE id = $${userIdIndex}
+            `;
+
+            // Execute the update query with dynamic values
+            await db.query(updateQuery, values);
         }
 
-        res.status(200).json({
-            message: 'User updated successfully',
-            updatedUser: rows[0] // Return the updated user object if necessary
-        });
+        await db.query('COMMIT');  // Commit the transaction after all updates
+        res.status(200).json({ message: 'User balances updated successfully!' });
     } catch (err) {
-        console.error("❌ Database error:", err);
-        res.status(500).send({ error: 'Database error' });
+        await db.query('ROLLBACK');  // Rollback the transaction in case of error
+        console.error('❌ Error updating users:', err);
+        res.status(500).json({ error: 'Failed to update user balances' });
     }
-}); 
+});
+
+  
+
 // ✅ Update User's Total Balance in `users` Table
 app.put('/api/update-total/:id', authenticateJWT, (req, res) => {
     const userId = req.params.id;

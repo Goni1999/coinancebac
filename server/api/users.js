@@ -29,7 +29,7 @@ const db = new Client({
 });
 
 const corsOptions = {
-    origin: 'https://reactfrontend-de12345.netlify.app', // Replace with your frontend domain
+    origin: 'https://capital-trust.eu', // Replace with your frontend domain
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   };
@@ -132,69 +132,29 @@ app.get('/api/users', authenticateJWT, checkRole('admin'), async (req, res) => {
     }
 });
 
-app.get('/api/users1', authenticateJWT, async (req, res) => {
-    console.log("✅ Admin access granted to /api/users");
 
-    // Log user information (helpful for debugging)
-    console.log("✅ User info from JWT:", req.user);
-
-    const query = `
-        SELECT id, name, email, role, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total
-        FROM users;
-    `;
-
-    try {
-        // Execute the query using the db client
-        const { rows } = await db.query(query);  // Use db.query() instead of pool.query()
-
-        // If no results found, return an appropriate response
-        if (rows.length === 0) {
-            return res.status(404).send({ error: 'No users found' });
-        }
-
-        // Send the rows of the result as the response
-        res.status(200).send(rows);  // Access the rows property to get the actual data
-
-    } catch (err) {
-        // Log the error and send a 500 status code if there's a problem with the database query
-        console.error("❌ Database error:", err);
-        res.status(500).send({ error: 'Database error' });
-    }
-});
-
-app.put('/api/users', authenticateJWT, checkRole('admin'), async (req, res) => {
-    const { id, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total } = req.body; // Extract `id` from request body
-
-    // Validate that required fields are present
-    if (!id || !BTC || !ETH || !ADA || !XRP || !DOGE || !BNB || !SOL || !DOT || !total) {
-        return res.status(400).json({ error: "All balance fields and user ID are required" });
-    }
-
-    const query = `
-        UPDATE users
-        SET BTC = $1, ETH = $2, ADA = $3, XRP = $4, DOGE = $5, BNB = $6, SOL = $7, DOT = $8, total = $9
-        WHERE id = $10;  
-    `;
-
-    try {
-        const { rows } = await db.query(query, [BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total, id]); // Use `id` from request body
-        
-        if (rows.length === 0) {
-            return res.status(404).send({ error: 'User not found' });
-        }
-
-        res.status(200).json({
-            message: 'User updated successfully',
-            updatedUser: rows[0] // Return the updated user object if necessary
-        });
-    } catch (err) {
-        console.error("❌ Database error:", err);
-        res.status(500).send({ error: 'Database error' });
-    }
-});
-
-
-app.post('/api/userss', authenticateJWT, async (req, res) => {
+app.get('/api/users/:id', authenticateJWT, (req, res) => {
+    const userId = req.params.id;
+    console.log("🔍 Fetching user balances for ID:", userId);
+  
+    const query = `SELECT BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total FROM users WHERE id = $1`;
+    db.query(query, [userId], (err, results) => {
+      if (err) {
+        console.error('❌ Database error:', err);
+        return res.status(500).send({ error: 'Database error' });
+      }
+  
+      if (results.length === 0) {
+        console.warn("⚠️ No user found for ID:", userId);
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      console.log("✅ User Balances:", results[0]);
+      res.json(results[0]);
+    });
+  });
+  
+  app.post('/api/userss', authenticateJWT, async (req, res) => {
     const { id } = req.body; // Get the `id` from the request body
     
     console.log("🔍 Fetching user balances for ID:", id);
@@ -223,8 +183,6 @@ app.post('/api/userss', authenticateJWT, async (req, res) => {
       return res.status(500).json({ error: 'Internal Server Error' });
     }
   });
-  
-  
 
   app.get('/api/userss1', (req, res) => {
     console.log("🔍 Fetching all users..."); // ✅ Debugging Log
@@ -248,4 +206,3 @@ app.post('/api/userss', authenticateJWT, async (req, res) => {
 
 
 export default app;
-
