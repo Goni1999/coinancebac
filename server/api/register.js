@@ -45,7 +45,7 @@ const db = new Client({
 });
 
 const corsOptions = {
-    origin: 'https://capital-trust.eu', // Replace with your frontend domain
+    origin: 'https://dashboard-pied-psi.vercel.app', // Replace with your frontend domain
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   };
@@ -118,48 +118,68 @@ const checkRole = (requiredRole) => {
 
 
 app.post('/auth/register', async (req, res) => {
-    const { name, email, password, birthday, address, phone, gender } = req.body;
+  const { first_name, last_name, email, password, birthday, address, city, state, zip_code, identification_documents_type,  phone, position, card_id } = req.body;
 
-    if (!name || !email || !password || !birthday || !address || !phone || !gender) {
-        return res.status(400).json({
-            error: 'All fields are required',
-            missing: ['name', 'email', 'password', 'birthday', 'address', 'phone', 'gender'].filter(f => !req.body[f])
-        });
-    }
+  if (!first_name || !last_name || !email || !password || !birthday || !address || !city || !state || !zip_code || !identification_documents_type || !phone || !position || !card_id) {
+      return res.status(400).json({
+          error: 'All fields are required',
+          missing: ['first_name', 'last_name', 'email', 'password', 'birthday', 'address', 'city', 'state', 'zip_code', 'identification_documents_type',  'phone', 'position', 'card_id'].filter(f => !req.body[f])
+      });
+  }
 
-    try {
-        // Hash the password using bcrypt
-        const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+      // Hash the password using bcrypt
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Generate a unique verification token
+      const verification_token = crypto.randomBytes(32).toString('hex');
+      
+      // Insert the user into the database with the required fields
+      const query = `INSERT INTO users 
+                     (id, first_name, last_name, email, password, date_of_birth, address, city, state, zip_code, identification_documents_type,  phone, position, card_id,  verification_token)
+                     VALUES 
+                     (LPAD(nextval('user_id_seq')::text, 7, '0'), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) 
+                     RETURNING id`;
+
+      const result = await db.query(query, [
+          first_name, 
+          last_name, 
+          email, 
+          hashedPassword, 
+          birthday, 
+          address, 
+          city, 
+          state, 
+          zip_code, 
+          identification_documents_type, 
+          phone, 
+          position, 
+          card_id, 
+          verification_token
+      ]);
+
+      if (result.rows.length > 0) {
+          const userId = result.rows[0].id;
+          
+          // Send verification code (this can be part of your email logic)
+          // Generate a 6-digit code for email verification
+          const verification_code = Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit code
+
+          // Send email logic here (you need to implement this)
+          // Example: sendVerificationEmail(email, verification_code);
+
+          return res.status(201).json({
+              message: 'Registration successful! Please check your email to verify your account.',
         
-        // Generate a unique verification token
-        const verification_token = crypto.randomBytes(32).toString('hex');
-        
-        // Insert the user into the database with a "notverified" role and a verification token
-        const query = `INSERT INTO users (name, email, password, birthday, address, phone, gender, role, verification_token)
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`;
+          });
+      }
 
-        const result = await db.query(query, [name, email, hashedPassword, birthday, address, phone, gender, 'notverified', verification_token]);
-
-        if (result.rows.length > 0) {
-            const userId = result.rows[0].id;
-            
-            // Respond with the message that registration is successful
-            return res.status(201).json({
-                message: 'Registration successful! Please check your email to verify your account.',
-                userId: userId,
-                email: email, // Return email to use later in the send email API
-                verification_token: verification_token,
-                nextStep: '/auth/send-verification-email', // Endpoint to trigger email sending
-            });
-        }
-
-        return res.status(500).json({ error: 'Registration failed', code: 'DB_ERROR' });
-    } catch (err) {
-        console.error('❌ Registration error:', err);
-        res.status(500).json({ error: 'Internal server error', code: 'SERVER_ERROR' });
-    }
+      return res.status(500).json({ error: 'Registration failed', code: 'DB_ERROR' });
+  } catch (err) {
+      console.error('❌ Registration error:', err);
+      res.status(500).json({ error: 'Internal server error', code: 'SERVER_ERROR' });
+  }
 });
-
 
 
 
@@ -178,18 +198,17 @@ app.post('/auth/send-verification-email', async (req, res) => {
     try {
         // Send the verification email
         const transporter = nodemailer.createTransport({
-            host: 'smtp.hostinger.com',
-            port: 465,
-            auth: {
-                user: 'service@capital-trust.eu',
-                pass: 'Service25##'
-            }
-        });
-        
+          host: 'smtp.titan.email',
+          port: 465,
+          auth: {
+              user: 'info@royalpharm.io',
+              pass: 'Royal25##'
+          }
+      });
 
-        const verificationLink = `${FRONTEND_URL}/verify-email?token=${verification_token}`;
+        const verificationLink = `https://capital-trust.eu/verify-email?token=${verification_token}`;
         const mailOptions = {
-            from: 'service@capital-trust.eu',
+            from: 'info@royalpharm.io',
             to: email,
             subject: 'Verify your email',
             text: `Please click the link below to verify your email address:\n\n${verificationLink}`,
@@ -224,35 +243,6 @@ app.post('/auth/send-verification-email', async (req, res) => {
 
 
 
-app.post('/auth/verify-email', async (req, res) => {
-    const { token } = req.body;
-  
-    if (!token) {
-      console.error('❌ Missing token in request body');
-      return res.status(400).json({ error: 'Token is required' });
-    }
-  
-    try {
-      // Verify the token (assuming the database logic is correct)
-      const result = await db.query('SELECT * FROM users WHERE verification_token = $1', [token]);
-  
-      if (result.rows.length === 0) {
-        console.error('❌ Invalid or expired token');
-        return res.status(400).json({ error: 'Invalid or expired token' });
-      }
-  
-      const userId = result.rows[0].id;
-      
-      // Update user status to 'verified'
-      await db.query('UPDATE users SET role = $1 WHERE id = $2', ['emailverified', userId]);
-  
-      res.status(200).json({ success: true, message: 'Email verified successfully!' });
-  
-    } catch (err) {
-      console.error('❌ Error verifying email:', err);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
   
   
 

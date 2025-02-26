@@ -43,6 +43,41 @@
   ],
   "routes": [
     {
+      
+       "src": "/api/resend-verification",
+      "dest": "/api/login.js"
+    }, 
+    {
+      
+      "src": "/api/check-otp-status",
+     "dest": "/api/login.js"
+   },
+    {
+      
+      "src": "/api/send-otp",
+     "dest": "/api/login.js"
+   },
+   {
+      
+    "src": "/api/verify-otp",
+   "dest": "/api/login.js"
+ },
+ {
+      
+  "src": "/api/check-kyc-status",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/check-email",
+ "dest": "/api/login.js"
+},
+   {
+      
+    "src": "/auth/verify-email",
+   "dest": "/api/login.js"
+ },
+    {
       "src": "/api/index",
       "dest": "/api/index.js"
     },
