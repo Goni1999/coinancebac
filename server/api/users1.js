@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pkg from 'pg';
 import dotenv from 'dotenv';
@@ -228,25 +227,6 @@ app.post('/api/userss', authenticateJWT, async (req, res) => {
   
   
 
-  app.get('/api/userss1', (req, res) => {
-    console.log("🔍 Fetching all users..."); // ✅ Debugging Log
-
-    const query = `SELECT id, name, email, BTC, ETH, ADA, XRP, DOGE, BNB, SOL, DOT, total FROM users`;
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('❌ Database error:', err);
-            return res.status(500).send({ error: 'Database error' });
-        }
-
-        if (results.length === 0) {
-            console.warn("⚠️ No users found in the database"); // ✅ Debugging Log
-            return res.status(404).json({ error: 'No users found' });
-        }
-
-        console.log("✅ Fetched all users:", results); // ✅ Debugging Log
-        res.json(results); // Return all users data
-    });
-});
 
 
 export default app;

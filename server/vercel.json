@@ -20,6 +20,7 @@
       "src": "api/reports.js",
       "use": "@vercel/node"
     },
+    
     {
       "src": "api/contact.js",
       "use": "@vercel/node"
@@ -62,6 +63,91 @@
     "src": "/api/verify-otp",
    "dest": "/api/login.js"
  },
+ {
+      
+  "src": "/api/check-user-role",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/logout",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/reset-password",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/request-password-reset",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/request-account-action",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/update-user-data",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/profit",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/events/:id",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/coins",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/update-coins",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/session",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/wallet",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/events",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/invoices",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/balance",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/transactions",
+ "dest": "/api/login.js"
+},
+{
+      
+  "src": "/api/get-user-data",
+ "dest": "/api/login.js"
+},
  {
       
   "src": "/api/check-kyc-status",

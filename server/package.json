@@ -1,6 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
+  "type": "module",  
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
     "bcrypt": "^5.1.1",

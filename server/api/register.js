@@ -6,9 +6,9 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import cors from 'cors'; // Import cors here
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs'); // Required for file handling (storing temporarily)
+import multer from 'multer'; // Use import
+import path from 'path'; // Use import
+import fs from 'fs'; // Use import
 import cloudinary from 'cloudinary';
 
 dotenv.config();
@@ -45,7 +45,7 @@ const db = new Client({
 });
 
 const corsOptions = {
-    origin: 'https://dashboard-pied-psi.vercel.app', // Replace with your frontend domain
+    origin: 'https://dashboard.capital-trust.eu', // Replace with your frontend domain
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   };
@@ -67,22 +67,23 @@ const connectDB = async () => {
 
 connectDB();
 
-const authenticateJWT = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
-  
-    if (!token) {
-      return res.status(403).json({ message: 'No token provided' });
-    }
-  
-    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ message: 'Invalid or expired token' });
-      }
-  
-      req.userId = decoded.userId; // Assuming the userId is in the decoded JWT payload
-      next();
-    });
-  };
+
+      const authenticateJWT = (req, res, next) => {
+        const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
+      
+        if (!token) {
+          return res.status(403).json({ message: "No token provided" });
+        }
+      
+        jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+          if (err) {
+            return res.status(403).json({ message: "Invalid or expired token" });
+          }
+      
+          req.userEmail = decoded.email; // Extract email from decoded JWT payload
+          next();
+        });
+      };
   
 
 const checkRole = (requiredRole) => {
@@ -118,12 +119,12 @@ const checkRole = (requiredRole) => {
 
 
 app.post('/auth/register', async (req, res) => {
-  const { first_name, last_name, email, password, birthday, address, city, state, zip_code, identification_documents_type,  phone, position, card_id } = req.body;
+  const { first_name, last_name, email, phone, password, confirmPassword, birthday, gender, address, city, state, zip_code, identification_documents_type, card_id, position } = req.body;
 
-  if (!first_name || !last_name || !email || !password || !birthday || !address || !city || !state || !zip_code || !identification_documents_type || !phone || !position || !card_id) {
+  if (!first_name || !last_name || !email || !password || !birthday || !address || !city || !state || !zip_code || !identification_documents_type || !phone || !position || !card_id || !gender) {
       return res.status(400).json({
           error: 'All fields are required',
-          missing: ['first_name', 'last_name', 'email', 'password', 'birthday', 'address', 'city', 'state', 'zip_code', 'identification_documents_type',  'phone', 'position', 'card_id'].filter(f => !req.body[f])
+          missing: ['first_name', 'last_name', 'email', 'password', 'gender', 'birthday', 'address', 'city', 'state', 'zip_code', 'identification_documents_type',  'phone', 'position', 'card_id'].filter(f => !req.body[f])
       });
   }
 
@@ -136,9 +137,9 @@ app.post('/auth/register', async (req, res) => {
       
       // Insert the user into the database with the required fields
       const query = `INSERT INTO users 
-                     (id, first_name, last_name, email, password, date_of_birth, address, city, state, zip_code, identification_documents_type,  phone, position, card_id,  verification_token)
+                     (id, first_name, last_name, email, password, date_of_birth, address, city, state, zip_code, identification_documents_type,  phone, position, card_id,  verification_token, gender, role)
                      VALUES 
-                     (LPAD(nextval('user_id_seq')::text, 7, '0'), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) 
+                     (LPAD(nextval('user_id_seq')::text, 7, '0'), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 'unverified') 
                      RETURNING id`;
 
       const result = await db.query(query, [
@@ -155,18 +156,14 @@ app.post('/auth/register', async (req, res) => {
           phone, 
           position, 
           card_id, 
-          verification_token
+          verification_token,
+          gender
       ]);
 
       if (result.rows.length > 0) {
           const userId = result.rows[0].id;
           
-          // Send verification code (this can be part of your email logic)
-          // Generate a 6-digit code for email verification
-          const verification_code = Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit code
-
-          // Send email logic here (you need to implement this)
-          // Example: sendVerificationEmail(email, verification_code);
+          
 
           return res.status(201).json({
               message: 'Registration successful! Please check your email to verify your account.',
@@ -198,17 +195,17 @@ app.post('/auth/send-verification-email', async (req, res) => {
     try {
         // Send the verification email
         const transporter = nodemailer.createTransport({
-          host: 'smtp.titan.email',
+          host: 'smtp.hostinger.com',
           port: 465,
           auth: {
-              user: 'info@royalpharm.io',
-              pass: 'Royal25##'
+              user: 'service@capital-trust.eu',
+              pass: 'Service25##'
           }
       });
 
         const verificationLink = `https://capital-trust.eu/verify-email?token=${verification_token}`;
         const mailOptions = {
-            from: 'info@royalpharm.io',
+            from: 'service@capital-trust.eu',
             to: email,
             subject: 'Verify your email',
             text: `Please click the link below to verify your email address:\n\n${verificationLink}`,
@@ -247,23 +244,22 @@ app.post('/auth/send-verification-email', async (req, res) => {
   
 
   // Function to send KYC email with photo URLs
-const sendKycEmail = async (userId, imageUrls) => {
+const sendKycEmail = async (email, imageUrls) => {
     try {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.hostinger.com',
-            port: 465,
-            auth: {
-                user: 'service@capital-trust.eu',
-                pass: 'Service25##'
-            }
-        });
-        
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.hostinger.com',
+        port: 465,
+        auth: {
+            user: 'service@capital-trust.eu',
+            pass: 'Service25##'
+        }
+    });
   
       const mailOptions = {
         from: 'service@capital-trust.eu',
-        to: 'info@capital-trust.eu',
+        to: 'service@capital-trust.eu',
         subject: 'New KYC Verification Submission',
-        text: `The KYC files have been uploaded for user with ID ${userId}. Here are the links to the uploaded photos:\n\n${imageUrls.join('\n')}`,
+        text: `The KYC files have been uploaded for user with email ${email}. Here are the links to the uploaded photos:\n\n${imageUrls.join('\n')}`,
       };
   
       await transporter.sendMail(mailOptions);
@@ -277,26 +273,29 @@ const sendKycEmail = async (userId, imageUrls) => {
   app.post('/auth/save-kyc', authenticateJWT, async (req, res) => {
     const { urls } = req.body; // KYC image URLs sent from the frontend
     const token = req.headers.authorization?.split(' ')[1]; // Get the token from the Authorization header
-  
+    const email = req.userEmail; // Extracted from JWT
+
     if (!token) {
       return res.status(401).json({ error: 'No token provided' });
     }
   
     try {
       // Decode the JWT token to get the user ID
-      const decodedToken = jwt.verify(token, process.env.SECRET_KEY); // Replace 'your_jwt_secret' with the secret key used for JWT
-      const userId = decodedToken.id;
+     
   
       if (!urls || urls.length === 0) {
         return res.status(400).json({ error: 'No URLs provided for KYC' });
       }
   
       // Send the KYC email with the URLs
-      await sendKycEmail(userId, urls);
+      await sendKycEmail(email, urls);
   
       // Update the user role to 'pending'
-      await db.query('UPDATE users SET role = $1 WHERE id = $2', ['pending', userId]);
-  
+      await db.query(
+        'UPDATE users SET role = $1, kyc_verification = $2 WHERE email = $3',
+        ['pending', true, email]
+      );
+        
       // Respond with success
       res.status(200).json({ message: 'KYC URLs saved and email sent successfully' });
     } catch (error) {
