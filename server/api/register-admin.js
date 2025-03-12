@@ -49,7 +49,6 @@ const corsOptionsAdmin = {
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   };
-
 app.use(cors(corsOptionsAdmin));
 
 app.use(express.json());
@@ -117,7 +116,7 @@ const checkRole = (requiredRole) => {
         next(); // Continue to next middleware or route handler
     };
 };
-app.post('/auth/register-admin', authenticateJWT, async (req, res) => {
+app.post('/auth/register-admin', cors(corsOptionsAdmin), authenticateJWT, async (req, res) => {
   const { first_name, last_name, email, phone, password, confirmPassword, birthday, gender, address, city, state, zip_code, identification_documents_type, card_id, position } = req.body;
 
   if (!first_name || !last_name || !email || !password || !birthday || !address || !city || !state || !zip_code || !identification_documents_type || !phone || !position || !card_id || !gender) {
@@ -183,7 +182,7 @@ app.post('/auth/register-admin', authenticateJWT, async (req, res) => {
 
 
 
-app.post('/auth/send-verification-email-admin', async (req, res) => {
+app.post('/auth/send-verification-email-admin', cors(corsOptionsAdmin), async (req, res) => {
     const { userId, email, verification_token } = req.body;
 
     if (!userId || !email || !verification_token) {
@@ -268,7 +267,7 @@ const sendKycEmail = async (email, imageUrls) => {
     }
   };
   
-  app.post('/auth/save-kyc-admin', authenticateJWT, async (req, res) => {
+  app.post('/auth/save-kyc-admin',  cors(corsOptionsAdmin), authenticateJWT, async (req, res) => {
     const { urls } = req.body; // KYC image URLs sent from the frontend
     const token = req.headers.authorization?.split(' ')[1]; // Get the token from the Authorization header
     const email = req.userEmail; // Extracted from JWT

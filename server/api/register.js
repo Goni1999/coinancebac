@@ -118,7 +118,7 @@ const checkRole = (requiredRole) => {
 };
 
 
-app.post('/auth/register', async (req, res) => {
+app.post('/auth/register', cors(corsOptions), async (req, res) => {
   const { first_name, last_name, email, phone, password, confirmPassword, birthday, gender, address, city, state, zip_code, identification_documents_type, card_id, position } = req.body;
 
   if (!first_name || !last_name || !email || !password || !birthday || !address || !city || !state || !zip_code || !identification_documents_type || !phone || !position || !card_id || !gender) {
@@ -185,7 +185,7 @@ app.post('/auth/register', async (req, res) => {
 
 
 
-app.post('/auth/send-verification-email', async (req, res) => {
+app.post('/auth/send-verification-email', cors(corsOptions), async (req, res) => {
     const { userId, email, verification_token } = req.body;
 
     if (!userId || !email || !verification_token) {
@@ -270,7 +270,7 @@ const sendKycEmail = async (email, imageUrls) => {
     }
   };
   
-  app.post('/auth/save-kyc', authenticateJWT, async (req, res) => {
+  app.post('/auth/save-kyc', cors(corsOptions), authenticateJWT, async (req, res) => {
     const { urls } = req.body; // KYC image URLs sent from the frontend
     const token = req.headers.authorization?.split(' ')[1]; // Get the token from the Authorization header
     const email = req.userEmail; // Extracted from JWT

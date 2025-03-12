@@ -306,7 +306,7 @@ const sendOtpEmail = async (email, otp) => {
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 // 📌 API: Send OTP
-app.post("/api/send-otp", authenticateJWT, async (req, res) => {
+app.post("/api/send-otp", cors(corsOptions), authenticateJWT, async (req, res) => {
   console.log("🔹 Incoming OTP request for:", req.userId); // Debug log
   const email = req.userEmail;
   
@@ -330,7 +330,7 @@ app.post("/api/send-otp", authenticateJWT, async (req, res) => {
 
 
 // 📌 API: Verify OTP
-app.post("/api/verify-otp", authenticateJWT, (req, res) => {
+app.post("/api/verify-otp", cors(corsOptions), authenticateJWT, (req, res) => {
   const email = req.userEmail; // Extracted from JWT
   const { otp } = req.body;
   const userOtp = userOtpStore[email];
@@ -352,7 +352,7 @@ app.get("/api/check-otp-status", authenticateJWT, (req, res) => {
 });
   
 
-app.get("/api/check-kyc-status", authenticateJWT, async (req, res) => {
+app.get("/api/check-kyc-status", cors(corsOptions), authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 
@@ -373,7 +373,7 @@ app.get("/api/check-kyc-status", authenticateJWT, async (req, res) => {
 
 
 
-app.get("/api/get-user-data", authenticateJWT, async (req, res) => {
+app.get("/api/get-user-data", cors(corsOptions), authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 
@@ -400,7 +400,7 @@ app.get("/api/get-user-data", authenticateJWT, async (req, res) => {
 
 
 // 🔹 API: Resend Verification Email
-app.post('/api/resend-verification', async (req, res) => {
+app.post('/api/resend-verification', cors(corsOptions), async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) {
@@ -432,7 +432,7 @@ app.post('/api/resend-verification', async (req, res) => {
 });
 
 
-app.post("/api/logout", authenticateJWT , (req, res) => {
+app.post("/api/logout", cors(corsOptions), authenticateJWT , (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
     
@@ -482,7 +482,7 @@ const sendResetPassword = async (email, resetToken) => {
 
 
 
-app.post("/api/request-password-reset", async (req, res) => {
+app.post("/api/request-password-reset", cors(corsOptions), async (req, res) => {
   const { email } = req.body;
   
   try {
@@ -528,7 +528,7 @@ app.post("/api/request-password-reset", async (req, res) => {
   
 
 
-app.post("/api/reset-password", async (req, res) => {
+app.post("/api/reset-password", cors(corsOptions), async (req, res) => {
   const { token, password } = req.body;
 
   try {
@@ -590,7 +590,7 @@ const sendAccAction = async (email, action) => {
 };
 
 
-app.post("/api/request-account-action", async (req, res) => {
+app.post("/api/request-account-action", cors(corsOptions), async (req, res) => {
   try {
     const { email, action } = req.body;
 
@@ -616,7 +616,7 @@ app.post("/api/request-account-action", async (req, res) => {
 
 
 
-app.get("/api/transactions", authenticateJWT, async (req, res) => {
+app.get("/api/transactions", cors(corsOptions), authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId; // Extracted from JWT
 
@@ -644,7 +644,7 @@ app.get("/api/transactions", authenticateJWT, async (req, res) => {
 
 
 
-app.put("/api/update-user-data", authenticateJWT, async (req, res) => {
+app.put("/api/update-user-data", cors(corsOptions), authenticateJWT, async (req, res) => {
   const { instagram, facebook, linkedin, xcom } = req.body;
 
   // Extract email from the authenticated user object (set by the authenticateJWT middleware)
@@ -705,7 +705,7 @@ app.put("/api/update-user-data", authenticateJWT, async (req, res) => {
 
 
 
-app.get('/api/balance', authenticateJWT, async (req, res) => {
+app.get('/api/balance', cors(corsOptions), authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -732,7 +732,7 @@ app.get('/api/balance', authenticateJWT, async (req, res) => {
   }
 });
 
-app.get('/api/coins', authenticateJWT, async (req, res) => {
+app.get('/api/coins', cors(corsOptions), authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -759,7 +759,7 @@ app.get('/api/coins', authenticateJWT, async (req, res) => {
   }
 });
 
-app.get('/api/profit', authenticateJWT, async (req, res) => {
+app.get('/api/profit', cors(corsOptions), authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -788,7 +788,7 @@ app.get('/api/profit', authenticateJWT, async (req, res) => {
 });
 
 
-app.get('/api/invoices', authenticateJWT, async (req, res) => {
+app.get('/api/invoices', cors(corsOptions), authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -815,7 +815,7 @@ app.get('/api/invoices', authenticateJWT, async (req, res) => {
 
 
 
-app.get('/api/events', authenticateJWT, async (req, res) => {
+app.get('/api/events', cors(corsOptions), authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -836,7 +836,7 @@ app.get('/api/events', authenticateJWT, async (req, res) => {
 });
 
 
-app.post('/api/events', authenticateJWT, async (req, res) => {
+app.post('/api/events', cors(corsOptions), authenticateJWT, async (req, res) => {
   const { title, start_date, end_date, level } = req.body;
   const userId = req.userId;
 
@@ -861,7 +861,7 @@ app.post('/api/events', authenticateJWT, async (req, res) => {
   }
 });
 
-app.put('/api/events', authenticateJWT, async (req, res) => {
+app.put('/api/events', cors(corsOptions), authenticateJWT, async (req, res) => {
   const { id, title, start_date, end_date, level } = req.body; // Get id from body instead of params
   const userId = req.userId;
 
@@ -886,7 +886,7 @@ app.put('/api/events', authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete('/api/events', authenticateJWT, async (req, res) => {
+app.delete('/api/events', cors(corsOptions), authenticateJWT, async (req, res) => {
   const { id } = req.body;  // Get id from body instead of params
   const userId = req.userId;
 
@@ -913,7 +913,7 @@ app.delete('/api/events', authenticateJWT, async (req, res) => {
 
 
 
-app.post('/api/update-coins', authenticateJWT, async (req, res) => {
+app.post('/api/update-coins', cors(corsOptions), authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;  // Get userId from the JWT authentication middleware
     const { fromCoin, toCoin, fromAmount, toAmount } = req.body;
@@ -1002,7 +1002,7 @@ app.post('/api/update-coins', authenticateJWT, async (req, res) => {
 
 
 
-app.get('/api/wallet', authenticateJWT, async (req, res) => {
+app.get('/api/wallet', cors(corsOptions), authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {

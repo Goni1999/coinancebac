@@ -163,7 +163,7 @@ app.post("/auth/login-admin", cors(corsOptionsAdmin), loginLimiter, async (req, 
 });
 
 
-app.get('/api/session-admin', (req, res) => {
+app.get('/api/session-admin',  cors(corsOptionsAdmin), (req, res) => {
   const token = req.cookies.sessionToken; // Get token from the HttpOnly cookie
   console.log('Session token:', token);  // Log the token for debugging
   
@@ -196,7 +196,7 @@ app.get('/api/session-admin', (req, res) => {
 
 
 // 🔹 API: Check Email Verification Status
-app.post('/auth/verify-email-admin', async (req, res) => {
+app.post('/auth/verify-email-admin', cors(corsOptionsAdmin),  async (req, res) => {
   const { token } = req.body;
 
   if (!token) {
@@ -228,7 +228,7 @@ app.post('/auth/verify-email-admin', async (req, res) => {
 
 
 
-  app.get("/api/check-email-admin", async (req, res) => {
+  app.get("/api/check-email-admin", cors(corsOptionsAdmin),  async (req, res) => {
     const { email } = req.query;
     if (!email) {
         return res.status(400).json({ error: "Email is required" });
@@ -257,7 +257,7 @@ app.post('/auth/verify-email-admin', async (req, res) => {
 
 
 // 📌 API: Check User Role
-app.get("/api/check-user-role-admin", authenticateJWT, async (req, res) => {
+app.get("/api/check-user-role-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 
@@ -306,7 +306,7 @@ const sendOtpEmail = async (email, otp) => {
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 // 📌 API: Send OTP
-app.post("/api/send-otp-admin", authenticateJWT, async (req, res) => {
+app.post("/api/send-otp-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   console.log("🔹 Incoming OTP request for:", req.userId); // Debug log
   const email = req.userEmail;
   
@@ -330,7 +330,7 @@ app.post("/api/send-otp-admin", authenticateJWT, async (req, res) => {
 
 
 // 📌 API: Verify OTP
-app.post("/api/verify-otp-admin", authenticateJWT, (req, res) => {
+app.post("/api/verify-otp-admin", cors(corsOptionsAdmin),  authenticateJWT, (req, res) => {
   const email = req.userEmail; // Extracted from JWT
   const { otp } = req.body;
   const userOtp = userOtpStore[email];
@@ -344,7 +344,7 @@ app.post("/api/verify-otp-admin", authenticateJWT, (req, res) => {
 });
 
 // 📌 API: Check OTP Status
-app.get("/api/check-otp-status", authenticateJWT, (req, res) => {
+app.get("/api/check-otp-status", cors(corsOptionsAdmin),  authenticateJWT, (req, res) => {
   const email = req.userEmail; // Extracted from JWT
   const userOtpData = userOtpStore[email];
 
@@ -352,7 +352,7 @@ app.get("/api/check-otp-status", authenticateJWT, (req, res) => {
 });
   
 
-app.get("/api/check-kyc-status-admin", authenticateJWT, async (req, res) => {
+app.get("/api/check-kyc-status-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 
@@ -373,7 +373,7 @@ app.get("/api/check-kyc-status-admin", authenticateJWT, async (req, res) => {
 
 
 
-app.get("/api/get-user-data-admin", authenticateJWT, async (req, res) => {
+app.get("/api/get-user-data-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 
@@ -400,7 +400,7 @@ app.get("/api/get-user-data-admin", authenticateJWT, async (req, res) => {
 
 
 // 🔹 API: Resend Verification Email
-app.post('/api/resend-verification-admin', async (req, res) => {
+app.post('/api/resend-verification-admin', cors(corsOptionsAdmin),  async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) {
@@ -432,7 +432,7 @@ app.post('/api/resend-verification-admin', async (req, res) => {
 });
 
 
-app.post("/api/logout-admin", authenticateJWT , (req, res) => {
+app.post("/api/logout-admin", cors(corsOptionsAdmin),  authenticateJWT , (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
     
@@ -482,7 +482,7 @@ const sendResetPassword = async (email, resetToken) => {
 
 
 
-app.post("/api/request-password-reset-admin", async (req, res) => {
+app.post("/api/request-password-reset-admin", cors(corsOptionsAdmin),  async (req, res) => {
   const { email } = req.body;
   
   try {
@@ -528,7 +528,7 @@ app.post("/api/request-password-reset-admin", async (req, res) => {
   
 
 
-app.post("/api/reset-password-admin", async (req, res) => {
+app.post("/api/reset-password-admin", cors(corsOptionsAdmin),  async (req, res) => {
   const { token, password } = req.body;
 
   try {
@@ -590,7 +590,7 @@ const sendAccAction = async (email, action) => {
 };
 
 
-app.post("/api/request-account-action-admin", async (req, res) => {
+app.post("/api/request-account-action-admin", cors(corsOptionsAdmin),  async (req, res) => {
   try {
     const { email, action } = req.body;
 
@@ -616,7 +616,7 @@ app.post("/api/request-account-action-admin", async (req, res) => {
 
 
 
-app.get("/api/transactions-admin", authenticateJWT, async (req, res) => {
+app.get("/api/transactions-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId; // Extracted from JWT
 
@@ -644,7 +644,7 @@ app.get("/api/transactions-admin", authenticateJWT, async (req, res) => {
 
 
 
-app.put("/api/update-user-data-admin", authenticateJWT, async (req, res) => {
+app.put("/api/update-user-data-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const { instagram, facebook, linkedin, xcom } = req.body;
 
   // Extract email from the authenticated user object (set by the authenticateJWT middleware)
@@ -704,7 +704,7 @@ app.put("/api/update-user-data-admin", authenticateJWT, async (req, res) => {
 });
 
 
-app.get('/api/balance-admin', authenticateJWT, async (req, res) => {
+app.get('/api/balance-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const adminEmail = req.userEmail; // Use the user's email from the JWT
 
   try {
@@ -734,7 +734,7 @@ app.get('/api/balance-admin', authenticateJWT, async (req, res) => {
 
 
 // Backend API to fetch transactions for the logged-in admin user
-app.get('/api/admin-transactions', authenticateJWT, async (req, res) => {
+app.get('/api/admin-transactions', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const adminEmail = req.userEmail; // Extract admin email from the JWT
 
   try {
@@ -774,7 +774,7 @@ app.get('/api/admin-transactions', authenticateJWT, async (req, res) => {
 });
 
 
-app.put('/api/update-balance-admin', authenticateJWT, async (req, res) => {
+app.put('/api/update-balance-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const {
     user_id,
     balance_id,   // Get the user_id from the request body
@@ -873,7 +873,7 @@ app.put('/api/update-balance-admin', authenticateJWT, async (req, res) => {
 });
 
 
-app.get('/api/coins-admin', authenticateJWT, async (req, res) => {
+app.get('/api/coins-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -900,7 +900,7 @@ app.get('/api/coins-admin', authenticateJWT, async (req, res) => {
   }
 });
 
-app.get('/api/profit-admin', authenticateJWT, async (req, res) => {
+app.get('/api/profit-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -929,7 +929,7 @@ app.get('/api/profit-admin', authenticateJWT, async (req, res) => {
 });
 
 
-app.get('/api/invoices-admin', authenticateJWT, async (req, res) => {
+app.get('/api/invoices-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -956,7 +956,7 @@ app.get('/api/invoices-admin', authenticateJWT, async (req, res) => {
 
 
 
-app.get('/api/events-admin', authenticateJWT, async (req, res) => {
+app.get('/api/events-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -977,7 +977,7 @@ app.get('/api/events-admin', authenticateJWT, async (req, res) => {
 });
 
 
-app.post('/api/events-admin', authenticateJWT, async (req, res) => {
+app.post('/api/events-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const { title, start_date, end_date, level } = req.body;
   const userId = req.userId;
 
@@ -1002,7 +1002,7 @@ app.post('/api/events-admin', authenticateJWT, async (req, res) => {
   }
 });
 
-app.put('/api/events-admin', authenticateJWT, async (req, res) => {
+app.put('/api/events-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const { id, title, start_date, end_date, level } = req.body; // Get id from body instead of params
   const userId = req.userId;
 
@@ -1027,7 +1027,7 @@ app.put('/api/events-admin', authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete('/api/events-admin', authenticateJWT, async (req, res) => {
+app.delete('/api/events-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const { id } = req.body;  // Get id from body instead of params
   const userId = req.userId;
 
@@ -1054,7 +1054,7 @@ app.delete('/api/events-admin', authenticateJWT, async (req, res) => {
 
 
 
-app.post('/api/update-coins-admin', authenticateJWT, async (req, res) => {
+app.post('/api/update-coins-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;  // Get userId from the JWT authentication middleware
     const { fromCoin, toCoin, fromAmount, toAmount } = req.body;
@@ -1143,7 +1143,7 @@ app.post('/api/update-coins-admin', authenticateJWT, async (req, res) => {
 
 
 
-app.get('/api/wallet-admin', authenticateJWT, async (req, res) => {
+app.get('/api/wallet-admin', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -1201,7 +1201,7 @@ const checkRole = (requiredRole) => {
 
 
 // Route to fetch users (only accessible by admin users)
-app.get("/api/users-admin", authenticateJWT, async (req, res) => {
+app.get("/api/users-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const adminEmail = req.userEmail; // Get the admin's email from the JWT
 
   if (!adminEmail) {
@@ -1225,7 +1225,7 @@ app.get("/api/users-admin", authenticateJWT, async (req, res) => {
 });
 
 
-app.put("/api/users-admin", async (req, res) => {
+app.put("/api/users-admin", cors(corsOptionsAdmin),  async (req, res) => {
   try {
     const {
       email, // Get the email from the request body
@@ -1369,7 +1369,7 @@ app.put("/api/users-admin", async (req, res) => {
   }
 });
 
-app.post('/api/admin-transactions-delete', authenticateJWT, async (req, res) => {
+app.post('/api/admin-transactions-delete', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const { transaction_id } = req.body; // Get transactionId from request body
 
   if (!transaction_id) {
@@ -1400,7 +1400,7 @@ app.post('/api/admin-transactions-delete', authenticateJWT, async (req, res) => 
 });
 
 
-app.post('/api/admin-transactions-add', authenticateJWT, async (req, res) => {
+app.post('/api/admin-transactions-add', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const {
     user_id, // Accept the user_id from the request body
     walletAddress,
