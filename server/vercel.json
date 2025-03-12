@@ -13,6 +13,14 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/login-admin.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/register-admin.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/users.js",
       "use": "@vercel/node"
     },
@@ -230,6 +238,180 @@
     {
       "src": "/auth/save-kyc",
       "dest": "/api/register.js"
-    }
+    },
+    {
+      
+      "src": "/api/resend-verification-admin",
+     "dest": "/api/login-admin.js"
+   }, 
+   {
+     
+     "src": "/api/check-otp-status-admin",
+    "dest": "/api/login-admin.js"
+  },
+   {
+     
+     "src": "/api/send-otp-admin",
+    "dest": "/api/login-admin.js"
+  },
+  {
+     
+   "src": "/api/verify-otp-admin",
+  "dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/check-user-role-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/logout-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/reset-password-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/request-password-reset-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/request-account-action-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/update-user-data-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/profit-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/events-admin/:id",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/coins-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/update-coins-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+  "src": "/api/users-admin",
+ "dest": "/api/login-admin.js"
+ },
+ {
+     
+  "src": "/api/update-balance-admin",
+ "dest": "/api/login-admin.js"
+ },
+ {
+     
+  "src": "/api/admin-transactions-add",
+ "dest": "/api/login-admin.js"
+ },
+ {
+     
+  "src": "/api/admin-transactions-delete",
+ "dest": "/api/login-admin.js"
+ },
+ {
+     
+  "src": "/api/admin-transactions",
+ "dest": "/api/login-admin.js"
+ },
+ {
+     
+  "src": "/api/users-admin/:id",
+ "dest": "/api/login-admin.js"
+ },
+{
+     
+ "src": "/api/session-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/wallet-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/events-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/invoices-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/balance-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/transactions-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/get-user-data-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/check-kyc-status-admin",
+"dest": "/api/login-admin.js"
+},
+{
+     
+ "src": "/api/check-email-admin",
+"dest": "/api/login-admin.js"
+},
+  {
+     
+   "src": "/auth/verify-email-admin",
+  "dest": "/api/login-admin.js"
+},
+{
+  "src": "/auth/login-admin",
+  "dest": "/api/login-admin.js"
+},
+{
+  "src": "/auth/register-admin",
+  "dest": "/api/register-admin.js"
+},
+{
+  "src": "/auth/send-verification-email-admin",
+  "dest": "/api/register-admin.js"
+},
+{
+  "src": "/auth/upload-photo-admin",
+  "dest": "/api/register-admin.js"
+},
+{
+  "src": "/auth/verify-email-admin",
+  "dest": "/api/register-admin.js"
+},
+{
+  "src": "/auth/save-kyc-admin",
+  "dest": "/api/register-admin.js"
+}
   ]
 }

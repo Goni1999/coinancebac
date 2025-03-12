@@ -34,7 +34,7 @@ const db = new Client({
 });
 
 const corsOptions = {
-  origin: [ 'https://dashboard.capital-trust.eu'], // Allow both domains
+  origin: ['https://admin.capital-trust.eu'], // Allow both domains
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   credentials: true, // Allow cookies and credentials to be sent
@@ -91,7 +91,7 @@ const loginLimiter = rateLimit({
             return res.status(403).json({ error: "Forbidden: Invalid token" });
           }
           req.userEmail = decoded.email; // Extract email from decoded JWT payload
-          req.userId = decoded.id; // Extract user ID from token
+          req.userId = decoded.id;
           next();
         });
       };
@@ -113,7 +113,7 @@ const sendVerificationEmail = async (email, token) => {
     console.log(`✅ Verification email sent to ${email}`);
 };
 
-app.post("/auth/login", loginLimiter, async (req, res) => {
+app.post("/auth/login-admin", loginLimiter, async (req, res) => {
   try {
     const { email, password, rememberMe } = req.body;
     if (!email || !password) {
@@ -163,7 +163,7 @@ app.post("/auth/login", loginLimiter, async (req, res) => {
 });
 
 
-app.get('/api/session', (req, res) => {
+app.get('/api/session-admin', (req, res) => {
   const token = req.cookies.sessionToken; // Get token from the HttpOnly cookie
   console.log('Session token:', token);  // Log the token for debugging
   
@@ -196,7 +196,7 @@ app.get('/api/session', (req, res) => {
 
 
 // 🔹 API: Check Email Verification Status
-app.post('/auth/verify-email', async (req, res) => {
+app.post('/auth/verify-email-admin', async (req, res) => {
   const { token } = req.body;
 
   if (!token) {
@@ -228,7 +228,7 @@ app.post('/auth/verify-email', async (req, res) => {
 
 
 
-  app.get("/api/check-email", async (req, res) => {
+  app.get("/api/check-email-admin", async (req, res) => {
     const { email } = req.query;
     if (!email) {
         return res.status(400).json({ error: "Email is required" });
@@ -257,7 +257,7 @@ app.post('/auth/verify-email', async (req, res) => {
 
 
 // 📌 API: Check User Role
-app.get("/api/check-user-role", authenticateJWT, async (req, res) => {
+app.get("/api/check-user-role-admin", authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 
@@ -306,7 +306,7 @@ const sendOtpEmail = async (email, otp) => {
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 // 📌 API: Send OTP
-app.post("/api/send-otp", authenticateJWT, async (req, res) => {
+app.post("/api/send-otp-admin", authenticateJWT, async (req, res) => {
   console.log("🔹 Incoming OTP request for:", req.userId); // Debug log
   const email = req.userEmail;
   
@@ -330,7 +330,7 @@ app.post("/api/send-otp", authenticateJWT, async (req, res) => {
 
 
 // 📌 API: Verify OTP
-app.post("/api/verify-otp", authenticateJWT, (req, res) => {
+app.post("/api/verify-otp-admin", authenticateJWT, (req, res) => {
   const email = req.userEmail; // Extracted from JWT
   const { otp } = req.body;
   const userOtp = userOtpStore[email];
@@ -352,7 +352,7 @@ app.get("/api/check-otp-status", authenticateJWT, (req, res) => {
 });
   
 
-app.get("/api/check-kyc-status", authenticateJWT, async (req, res) => {
+app.get("/api/check-kyc-status-admin", authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 
@@ -373,7 +373,7 @@ app.get("/api/check-kyc-status", authenticateJWT, async (req, res) => {
 
 
 
-app.get("/api/get-user-data", authenticateJWT, async (req, res) => {
+app.get("/api/get-user-data-admin", authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 
@@ -400,7 +400,7 @@ app.get("/api/get-user-data", authenticateJWT, async (req, res) => {
 
 
 // 🔹 API: Resend Verification Email
-app.post('/api/resend-verification', async (req, res) => {
+app.post('/api/resend-verification-admin', async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) {
@@ -432,7 +432,7 @@ app.post('/api/resend-verification', async (req, res) => {
 });
 
 
-app.post("/api/logout", authenticateJWT , (req, res) => {
+app.post("/api/logout-admin", authenticateJWT , (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
     
@@ -482,7 +482,7 @@ const sendResetPassword = async (email, resetToken) => {
 
 
 
-app.post("/api/request-password-reset", async (req, res) => {
+app.post("/api/request-password-reset-admin", async (req, res) => {
   const { email } = req.body;
   
   try {
@@ -528,7 +528,7 @@ app.post("/api/request-password-reset", async (req, res) => {
   
 
 
-app.post("/api/reset-password", async (req, res) => {
+app.post("/api/reset-password-admin", async (req, res) => {
   const { token, password } = req.body;
 
   try {
@@ -590,7 +590,7 @@ const sendAccAction = async (email, action) => {
 };
 
 
-app.post("/api/request-account-action", async (req, res) => {
+app.post("/api/request-account-action-admin", async (req, res) => {
   try {
     const { email, action } = req.body;
 
@@ -616,7 +616,7 @@ app.post("/api/request-account-action", async (req, res) => {
 
 
 
-app.get("/api/transactions", authenticateJWT, async (req, res) => {
+app.get("/api/transactions-admin", authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId; // Extracted from JWT
 
@@ -644,7 +644,7 @@ app.get("/api/transactions", authenticateJWT, async (req, res) => {
 
 
 
-app.put("/api/update-user-data", authenticateJWT, async (req, res) => {
+app.put("/api/update-user-data-admin", authenticateJWT, async (req, res) => {
   const { instagram, facebook, linkedin, xcom } = req.body;
 
   // Extract email from the authenticated user object (set by the authenticateJWT middleware)
@@ -704,35 +704,176 @@ app.put("/api/update-user-data", authenticateJWT, async (req, res) => {
 });
 
 
-
-app.get('/api/balance', authenticateJWT, async (req, res) => {
-  const userId = req.userId;
+app.get('/api/balance-admin', authenticateJWT, async (req, res) => {
+  const adminEmail = req.userEmail; // Use the user's email from the JWT
 
   try {
-    // Query to get the user's balance data from the database
+    // Query to get the user's balance data based on admin_email
     const query = `
-      SELECT
-        bitcoin, ethereum, xrp, tether, bnb, solana, usdc, dogecoin, cardano, staked_ether 
-      FROM balance
-      WHERE user_id = $1 AND status = 'Active';
+      SELECT 
+       b.user_id, b.bitcoin, b.ethereum, b.xrp, b.tether, b.bnb, b.solana, b.usdc, b.dogecoin, b.cardano, b.staked_ether, b.balance_id, b.deposit_wallet, b.unpaid_amount, b.usdt_total
+      FROM balance b
+      JOIN users u ON u.id = b.user_id
+      WHERE u.admin_email = $1 AND b.status = 'Active';
     `;
     
-    // Execute the query with the user's ID
-    const result = await db.query(query, [userId]);
+    // Execute the query with the admin's email
+    const result = await db.query(query, [adminEmail]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Balance not found for user' });
+      return res.status(404).json({ error: 'Balance not found for the admin\'s users' });
     }
 
     // Send the balance data back as a response
-    res.json(result.rows[0]);
+    res.json(result.rows);
   } catch (error) {
     console.error("Error fetching user balance from database:", error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-app.get('/api/coins', authenticateJWT, async (req, res) => {
+
+// Backend API to fetch transactions for the logged-in admin user
+app.get('/api/admin-transactions', authenticateJWT, async (req, res) => {
+  const adminEmail = req.userEmail; // Extract admin email from the JWT
+
+  try {
+    // Query to get the transaction data based on admin_email
+    const query = `
+      SELECT 
+        t.transaction_id, 
+        t.user_id, 
+        t.balance_id, 
+        t.time, 
+        t.type, 
+        t.coin, 
+        t.amount, 
+        t.destination, 
+        t.txid, 
+        t.status, 
+        t.details, 
+        t.admin_email
+      FROM transactions t
+      JOIN users u ON u.id = t.user_id
+      WHERE u.admin_email = $1;
+    `;
+    
+    // Execute the query with the admin's email
+    const result = await db.query(query, [adminEmail]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No transactions found for the admin\'s users' });
+    }
+
+    // Send the transaction data back as a response
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching transactions from database:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.put('/api/update-balance-admin', authenticateJWT, async (req, res) => {
+  const {
+    user_id,
+    balance_id,   // Get the user_id from the request body
+    balance,   // This will be an object containing the updated balance for various coins
+    status,
+    usdt_total,
+    unpaid_amount,
+    deposit_wallet
+  } = req.body; // Get updated data from the request body
+
+  if (!user_id) {
+    return res.status(400).json({ error: 'user_id is required in the request body' });
+  }
+
+  try {
+    // Query to get the user's balance data based on user_id
+    const query = `
+      SELECT b.user_id, b.bitcoin, b.ethereum, b.xrp, b.tether, b.bnb, b.solana, b.usdc, b.dogecoin, b.cardano, b.staked_ether, b.balance_id, b.deposit_wallet, b.unpaid_amount, b.usdt_total
+      FROM balance b
+      WHERE b.user_id = $1;
+    `;
+    
+    const result = await db.query(query, [user_id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User balance not found' });
+    }
+
+    // Get the current balance data
+    const currentBalance = result.rows[0];
+
+    // Prepare update query and values
+    const updateValues = [];
+    let updateQuery = `
+      UPDATE balance
+      SET
+    `;
+
+    // Conditionally update fields based on the request body
+    const balanceKeys = ['bitcoin', 'ethereum', 'xrp', 'tether', 'bnb', 'solana', 'usdc', 'dogecoin', 'cardano', 'staked_ether'];
+
+    // Check each balance field and add to the update query if it's different from the current value
+    balanceKeys.forEach((key) => {
+      if (balance && balance[key] !== undefined && balance[key] !== currentBalance[key]) {
+        updateQuery += `${key} = $${updateValues.length + 1}, `;
+        updateValues.push(balance[key]);
+      }
+    });
+
+    // Check other fields for updates
+    if (status !== undefined && status !== currentBalance.status) {
+      updateQuery += `status = $${updateValues.length + 1}, `;
+      updateValues.push(status);
+    }
+    if (balance_id !== undefined && status !== currentBalance.balance_id) {
+      updateQuery += `balance_id = $${updateValues.length + 1}, `;
+      updateValues.push(balance_id);
+    }
+
+    if (usdt_total !== undefined && usdt_total !== currentBalance.usdt_total) {
+      updateQuery += `usdt_total = $${updateValues.length + 1}, `;
+      updateValues.push(usdt_total);
+    }
+
+    if (unpaid_amount !== undefined && unpaid_amount !== currentBalance.unpaid_amount) {
+      updateQuery += `unpaid_amount = $${updateValues.length + 1}, `;
+      updateValues.push(unpaid_amount);
+    }
+
+    if (deposit_wallet !== undefined && deposit_wallet !== currentBalance.deposit_wallet) {
+      updateQuery += `deposit_wallet = $${updateValues.length + 1}, `;
+      updateValues.push(deposit_wallet);
+    }
+
+    // If no updates, send a response indicating no changes
+    if (updateValues.length === 0) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    // Remove the trailing comma and space from the query
+    updateQuery = updateQuery.slice(0, -2);
+
+    // Add the condition to specify the user_id in the WHERE clause
+    updateQuery += ` WHERE user_id = $${updateValues.length + 1} RETURNING *;`;
+    updateValues.push(user_id);
+
+    // Execute the update query
+    const updateResult = await db.query(updateQuery, updateValues);
+
+    // Return the updated balance data
+    res.json({ message: 'Balance updated successfully', data: updateResult.rows[0] });
+  } catch (error) {
+    console.error("Error updating user balance:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.get('/api/coins-admin', authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -759,7 +900,7 @@ app.get('/api/coins', authenticateJWT, async (req, res) => {
   }
 });
 
-app.get('/api/profit', authenticateJWT, async (req, res) => {
+app.get('/api/profit-admin', authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -788,7 +929,7 @@ app.get('/api/profit', authenticateJWT, async (req, res) => {
 });
 
 
-app.get('/api/invoices', authenticateJWT, async (req, res) => {
+app.get('/api/invoices-admin', authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -815,7 +956,7 @@ app.get('/api/invoices', authenticateJWT, async (req, res) => {
 
 
 
-app.get('/api/events', authenticateJWT, async (req, res) => {
+app.get('/api/events-admin', authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -836,7 +977,7 @@ app.get('/api/events', authenticateJWT, async (req, res) => {
 });
 
 
-app.post('/api/events', authenticateJWT, async (req, res) => {
+app.post('/api/events-admin', authenticateJWT, async (req, res) => {
   const { title, start_date, end_date, level } = req.body;
   const userId = req.userId;
 
@@ -861,7 +1002,7 @@ app.post('/api/events', authenticateJWT, async (req, res) => {
   }
 });
 
-app.put('/api/events', authenticateJWT, async (req, res) => {
+app.put('/api/events-admin', authenticateJWT, async (req, res) => {
   const { id, title, start_date, end_date, level } = req.body; // Get id from body instead of params
   const userId = req.userId;
 
@@ -886,7 +1027,7 @@ app.put('/api/events', authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete('/api/events', authenticateJWT, async (req, res) => {
+app.delete('/api/events-admin', authenticateJWT, async (req, res) => {
   const { id } = req.body;  // Get id from body instead of params
   const userId = req.userId;
 
@@ -913,7 +1054,7 @@ app.delete('/api/events', authenticateJWT, async (req, res) => {
 
 
 
-app.post('/api/update-coins', authenticateJWT, async (req, res) => {
+app.post('/api/update-coins-admin', authenticateJWT, async (req, res) => {
   try {
     const userId = req.userId;  // Get userId from the JWT authentication middleware
     const { fromCoin, toCoin, fromAmount, toAmount } = req.body;
@@ -1002,7 +1143,7 @@ app.post('/api/update-coins', authenticateJWT, async (req, res) => {
 
 
 
-app.get('/api/wallet', authenticateJWT, async (req, res) => {
+app.get('/api/wallet-admin', authenticateJWT, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -1025,6 +1166,290 @@ app.get('/api/wallet', authenticateJWT, async (req, res) => {
   } catch (error) {
     console.error("Error fetching user balance from database:", error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+const checkRole = (requiredRole) => {
+  return (req, res, next) => {
+      console.log(`Checking Role - Required: '${requiredRole}', User Role: '${req.user?.role}'`);
+
+      // Ensure that the user object exists and contains a role
+      if (!req.user) {
+          console.log("🚨 No user found in request");
+          return res.status(403).json({ error: 'Forbidden: User not authenticated' });
+      }
+
+      // Check if role is present in user object
+      if (!req.user.role) {
+          console.log("🚨 No role found in user object");
+          return res.status(403).json({ error: 'Forbidden: No role found' });
+      }
+
+      // Check if user's role matches required role
+      const userRole = req.user.role.trim().toLowerCase();
+      const requiredRoleTrimmed = requiredRole.trim().toLowerCase();
+
+      if (userRole !== requiredRoleTrimmed) {
+          console.log(`🚨 Role mismatch - Blocking access! (User Role: '${req.user.role}')`);
+          return res.status(403).json({ error: `Forbidden: Insufficient permissions for '${requiredRole}'` });
+      }
+
+      console.log("✅ Role check passed - Access granted!");
+      next(); // Continue to next middleware or route handler
+  };
+};
+
+
+// Route to fetch users (only accessible by admin users)
+app.get("/api/users-admin", authenticateJWT, async (req, res) => {
+  const adminEmail = req.userEmail; // Get the admin's email from the JWT
+
+  if (!adminEmail) {
+    return res.status(403).json({ error: "Admin email not found in the token." });
+  }
+
+  try {
+    // Modify the query to select users created by the admin (matching admin_email with req.userEmail)
+    const result = await db.query("SELECT * FROM users WHERE admin_email = $1", [adminEmail]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "No users found for this admin." });
+    }
+
+    // Send the result back
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+app.put("/api/users-admin", async (req, res) => {
+  try {
+    const {
+      email, // Get the email from the request body
+      first_name,
+      last_name,
+      date_of_birth,
+      phone,
+      address,
+      city,
+      state,
+      zip_code,
+      role,
+      gender,
+      card_id,
+      position,
+      two_factor_enabled,
+      kyc_verification,
+      identification_documents_type,
+      facebook_link,
+      linkedin_link,
+      instagram_link,
+      xcom_link,
+    } = req.body; // Get all the other fields for update
+
+    // Ensure email is provided
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    // Prepare the SQL query dynamically based on which fields are provided
+    const fieldsToUpdate = [];
+    const values = [];
+
+    // Add fields that are provided in the request body
+    if (first_name) {
+      fieldsToUpdate.push("first_name = $1");
+      values.push(first_name);
+    }
+    if (last_name) {
+      fieldsToUpdate.push("last_name = $2");
+      values.push(last_name);
+    }
+    if (date_of_birth) {
+      fieldsToUpdate.push("date_of_birth = $3");
+      values.push(date_of_birth);
+    }
+    if (phone) {
+      fieldsToUpdate.push("phone = $4");
+      values.push(phone);
+    }
+    if (address) {
+      fieldsToUpdate.push("address = $5");
+      values.push(address);
+    }
+    if (city) {
+      fieldsToUpdate.push("city = $6");
+      values.push(city);
+    }
+    if (state) {
+      fieldsToUpdate.push("state = $7");
+      values.push(state);
+    }
+    if (zip_code) {
+      fieldsToUpdate.push("zip_code = $8");
+      values.push(zip_code);
+    }
+    if (role) {
+      fieldsToUpdate.push("role = $9");
+      values.push(role);
+    }
+    if (gender) {
+      fieldsToUpdate.push("gender = $10");
+      values.push(gender);
+    }
+    if (card_id) {
+      fieldsToUpdate.push("card_id = $11");
+      values.push(card_id);
+    }
+    if (position) {
+      fieldsToUpdate.push("position = $12");
+      values.push(position);
+    }
+    if (two_factor_enabled) {
+      fieldsToUpdate.push("two_factor_enabled = $13");
+      values.push(two_factor_enabled);
+    }
+    if (kyc_verification) {
+      fieldsToUpdate.push("kyc_verification = $14");
+      values.push(kyc_verification);
+    }
+    if (identification_documents_type) {
+      fieldsToUpdate.push("identification_documents_type = $15");
+      values.push(identification_documents_type);
+    }
+    if (facebook_link) {
+      fieldsToUpdate.push("facebook_link = $16");
+      values.push(facebook_link);
+    }
+    if (linkedin_link) {
+      fieldsToUpdate.push("linkedin_link = $17");
+      values.push(linkedin_link);
+    }
+    if (instagram_link) {
+      fieldsToUpdate.push("instagram_link = $18");
+      values.push(instagram_link);
+    }
+    if (xcom_link) {
+      fieldsToUpdate.push("xcom_link = $19");
+      values.push(xcom_link);
+    }
+
+    // If no fields are provided for update, return an error
+    if (fieldsToUpdate.length === 0) {
+      return res.status(400).json({ error: "No fields provided for update" });
+    }
+
+    // Add the email as the last value in the array for the WHERE clause
+    values.push(email);
+
+    // Create the SQL query string dynamically based on the fields provided
+    const updateQuery = `
+      UPDATE users
+      SET ${fieldsToUpdate.join(", ")}
+      WHERE email = $${values.length}
+      RETURNING *;
+    `;
+
+    // Execute the update query
+    const result = await db.query(updateQuery, values);
+
+    // Check if the user was found and updated
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Return the updated user
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post('/api/admin-transactions-delete', authenticateJWT, async (req, res) => {
+  const { transaction_id } = req.body; // Get transactionId from request body
+
+  if (!transaction_id) {
+    return res.status(400).json({ message: 'Transaction ID is required' });
+  }
+
+  try {
+    // SQL query to delete the transaction only if the admin email matches
+    const result = await db.query(
+      `DELETE FROM transactions b
+       USING users u
+       WHERE b.transaction_id = $1
+         AND b.user_id = u.id
+         AND u.admin_email = $2
+       RETURNING b.*`,
+      [transaction_id, req.userEmail]  // Pass transaction_id and admin_email
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Transaction not found or admin mismatch' });
+    }
+
+    return res.status(200).json({ message: 'Transaction deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+app.post('/api/admin-transactions-add', authenticateJWT, async (req, res) => {
+  const {
+    user_id, // Accept the user_id from the request body
+    walletAddress,
+    time,
+    type,
+    coin,
+    amount,
+    destination,
+    txid,
+    status,
+    details
+  } = req.body;
+const email = req.userEmail
+  // Ensure all required fields are provided
+  if (!walletAddress || !time || !type || !coin || !amount || !destination || !txid || !status || !user_id) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  try {
+    // SQL query to insert the new transaction with the user_id from the request
+    const result = await db.query(
+      `INSERT INTO transactions (user_id, balance_id, time, type, coin, amount, destination, txid, status, details, admin_email)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       RETURNING *`,
+      [
+        user_id,  // Use the user_id passed in the request body
+        walletAddress,
+        time,
+        type,
+        coin,
+        amount,
+        destination,
+        txid,
+        status,
+        details,
+        email
+      ]
+    );
+
+    // If insertion was successful, return the transaction details
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Failed to add transaction' });
+    }
+
+    // Respond with the newly created transaction
+    return res.status(201).json({ message: 'Transaction added successfully', transaction: result.rows[0] });
+  } catch (error) {
+    console.error('Error adding transaction:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 });
 
