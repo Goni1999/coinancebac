@@ -113,7 +113,7 @@ const sendVerificationEmail = async (email, token) => {
     console.log(`✅ Verification email sent to ${email}`);
 };
 
-app.post("/auth/login", loginLimiter, async (req, res) => {
+app.post("/auth/login", cors(corsOptions), loginLimiter, async (req, res) => {
   try {
     const { email, password, rememberMe } = req.body;
     if (!email || !password) {
@@ -257,7 +257,7 @@ app.post('/auth/verify-email', async (req, res) => {
 
 
 // 📌 API: Check User Role
-app.get("/api/check-user-role", authenticateJWT, async (req, res) => {
+app.get("/api/check-user-role", cors(corsOptions), authenticateJWT, async (req, res) => {
   try {
     const email = req.userEmail; // Extracted from JWT
 

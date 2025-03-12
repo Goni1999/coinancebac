@@ -33,7 +33,7 @@ const db = new Client({
     },
 });
 
-const corsOptions = {
+const corsOptionsAdmin = {
   origin: ['https://admin.capital-trust.eu'], // Allow both domains
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
@@ -42,7 +42,7 @@ const corsOptions = {
 
 
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptionsAdmin));
 
 
 app.use(express.json());
@@ -113,7 +113,7 @@ const sendVerificationEmail = async (email, token) => {
     console.log(`✅ Verification email sent to ${email}`);
 };
 
-app.post("/auth/login-admin", loginLimiter, async (req, res) => {
+app.post("/auth/login-admin", cors(corsOptionsAdmin), loginLimiter, async (req, res) => {
   try {
     const { email, password, rememberMe } = req.body;
     if (!email || !password) {
@@ -503,7 +503,7 @@ app.post("/api/request-password-reset-admin", async (req, res) => {
       console.log("Hashed Token:", hashedToken);
       console.log("Expiry:", expiresAt);
 
-      // Store token in DB
+      // Store token in db
       const updateResult = await db.query(
           "UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE email = $3 RETURNING *",
           [hashedToken, expiresAt, email]

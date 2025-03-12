@@ -44,13 +44,13 @@ const db = new Client({
     },
 });
 
-const corsOptions = {
+const corsOptionsAdmin = {
     origin: 'https://admin.capital-trust.eu', // Replace with your frontend domain
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptionsAdmin));
 
 app.use(express.json());
 
