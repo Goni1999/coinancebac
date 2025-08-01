@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pkg from 'pg';
 import dotenv from 'dotenv';

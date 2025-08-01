@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pkg from 'pg';
 import dotenv from 'dotenv';
@@ -65,6 +65,15 @@ app.use((req, res, next) => {
 app.use(cors(corsOptions));
 
 app.use(express.json());
+
+// Global error handler to ensure CORS headers on all responses
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(500).json({ message: 'Internal server error' });
+});
+
 // ✅ Login Rate Limiter
 
 // Connect to the PostgreSQL database
@@ -504,10 +513,23 @@ const sendResetPassword = async (email, resetToken) => {
 app.post("/api/request-password-reset", cors(corsOptions), async (req, res) => {
   console.log("Password reset endpoint called with:", req.method, req.url);
   console.log("Request headers:", req.headers);
+  
+  // Ensure CORS headers are always set
+  res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
   const { email } = req.body;
+  console.log("Received email:", email);
+  
+  // Validate email is provided
+  if (!email) {
+    console.log("❌ No email provided");
+    return res.status(400).json({ message: "Email is required" });
+  }
   
   try {
-
       // Check if user exists
       const user = await db.query("SELECT id FROM users WHERE email = $1", [email]);
       if (user.rowCount === 0) {
@@ -542,6 +564,10 @@ app.post("/api/request-password-reset", cors(corsOptions), async (req, res) => {
       res.json({ message: "Password reset email sent" });
 
   } catch (error) {
+      console.error("❌ Password reset error:", error);
+      // Ensure CORS headers on error responses
+      res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
+      res.header('Access-Control-Allow-Credentials', 'true');
       res.status(500).json({ message: "Server error", error: error.message });
   }
 });
