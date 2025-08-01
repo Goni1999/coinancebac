@@ -51,15 +51,18 @@ const sendResetPassword = async (email, resetToken) => {
 
 // Main handler function
 export default async function handler(req, res) {
-    // Set CORS headers
+    console.log('🔥 FUNCTION REACHED:', req.method, req.url);
+    console.log('🔥 Origin:', req.headers.origin);
+    
+    // Set CORS headers FIRST
     res.setHeader('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-    // Handle preflight OPTIONS request
+    // Handle preflight OPTIONS request IMMEDIATELY
     if (req.method === 'OPTIONS') {
-        console.log('OPTIONS request handled for password reset');
+        console.log('✅ OPTIONS preflight handled successfully');
         return res.status(200).end();
     }
 
