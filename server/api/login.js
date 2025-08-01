@@ -34,10 +34,11 @@ const db = new Client({
 });
 
 const corsOptions = {
-  origin: [ 'https://dashboard.coinance.co'], // Allow both domains
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
+  origin: ['https://dashboard.coinance.co'], // Allow dashboard domain
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   credentials: true, // Allow cookies and credentials to be sent
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 };
 
 
