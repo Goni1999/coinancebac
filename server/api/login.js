@@ -43,24 +43,26 @@ const corsOptions = {
 
 
 
-app.use(cors(corsOptions));
-
-// Explicitly handle OPTIONS requests for all routes
-app.options('*', cors(corsOptions));
-
-// Additional CORS middleware for serverless functions
+// Handle OPTIONS requests first, before any other middleware
 app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+  
+  // Set CORS headers for all requests
   res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.header('Access-Control-Allow-Credentials', 'true');
   
+  // Handle preflight OPTIONS requests
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    console.log('OPTIONS request handled');
+    return res.status(200).end();
   }
+  
   next();
 });
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 // ✅ Login Rate Limiter
@@ -500,6 +502,8 @@ const sendResetPassword = async (email, resetToken) => {
 
 
 app.post("/api/request-password-reset", cors(corsOptions), async (req, res) => {
+  console.log("Password reset endpoint called with:", req.method, req.url);
+  console.log("Request headers:", req.headers);
   const { email } = req.body;
   
   try {
