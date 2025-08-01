@@ -48,10 +48,6 @@
     {
       "src": "api/users1.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "api/request-password-reset.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -93,7 +89,7 @@
 {
       
   "src": "/api/request-password-reset",
- "dest": "/api/request-password-reset.js"
+ "dest": "/api/login.js"
 },
 {
       
