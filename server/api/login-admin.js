@@ -34,7 +34,7 @@ const db = new Client({
 });
 
 const corsOptionsAdmin = {
-  origin: ['https://admin.capital-trust.eu'], // Allow both domains
+  origin: ['https://admin.coinance.co'], // Allow both domains
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   credentials: true, // Allow cookies and credentials to be sent
@@ -71,8 +71,8 @@ const loginLimiter = rateLimit({
           host: 'smtp.hostinger.com',
           port: 465,
           auth: {
-              user: 'service@capital-trust.eu',
-              pass: 'Service25##'
+              user: 'support@coinance.co',
+              pass: 'Zoja25##'
           }
       });
 
@@ -99,12 +99,12 @@ const loginLimiter = rateLimit({
 
 // Function to send a verification email
 const sendVerificationEmail = async (email, token) => {
-    const verificationLink = `https://dashboard.capital-trust.eu/emailverification?token=${token}`;
+    const verificationLink = `https://dashboard.coinance.co/emailverification?token=${token}`;
     
     const mailOptions = {
-        from: "service@capital-trust.eu",
+        from: "support@coinance.co",
         to: email,
-        subject: "Verify Your Email - Capital Trust",
+        subject: "Verify Your Email - Coinance",
         html: `<p>Click the link below to verify your email:</p>
                <a href="${verificationLink}">Verify your email</a>`,
     };
@@ -289,13 +289,13 @@ const sendOtpEmail = async (email, otp) => {
         host: 'smtp.hostinger.com',
         port: 465,
         auth: {
-            user: 'service@capital-trust.eu',
-            pass: 'Service25##'
+            user: 'support@coinance.co',
+            pass: 'Zoja25##'
         }
     });
   
     const mailOptions = {
-      from: "service@capital-trust.eu",
+      from: "support@coinance.co",
       to: email,
       subject: "Your Verification Code",
       text: `Your verification code is: ${otp}. This code will expire in 5 minutes.`,
@@ -459,17 +459,17 @@ app.post("/api/logout-admin", cors(corsOptionsAdmin),  authenticateJWT , (req, r
 
 // Function to send a verification email
 const sendResetPassword = async (email, resetToken) => {
-    const resetLink = `https://dashboard.capital-trust.eu/resetpassword?token=${resetToken}`;
+    const resetLink = `https://dashboard.coinance.co/resetpassword?token=${resetToken}`;
     const transporter = nodemailer.createTransport({
       host: 'smtp.hostinger.com',
       port: 465,
       auth: {
-          user: 'service@capital-trust.eu',
-          pass: 'Service25##'
+          user: 'support@coinance.co',
+          pass: 'Zoja25##'
       }
   });
     const mailOptions = {
-        from: "service@capital-trust.eu",
+        from: "support@coinance.co",
         to: email,
         subject: "Password Reset",
         html: `Click here to reset your password: ${resetLink}`,
@@ -575,13 +575,13 @@ const sendAccAction = async (email, action) => {
     host: 'smtp.hostinger.com',
     port: 465,
     auth: {
-        user: 'service@capital-trust.eu',
-        pass: 'Service25##'
+        user: 'support@coinance.co',
+        pass: 'Zoja25##'
     }
 });
   const mailOptions = {
-      from: "service@capital-trust.eu",
-      to: "service@capital-trust.eu",
+      from: "support@coinance.co",
+      to: "support@coinance.co",
       subject: "Account action to take",
       html: `User ${email} has requested to ${action} their account. Please review the request.`,
   };

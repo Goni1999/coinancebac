@@ -26,7 +26,7 @@ const db = new Client({
 });
 
 const corsOptions = {
-    origin: 'https://capital-trust.eu', // Update this to your frontend URL
+    origin: 'https://coinance.co', // Update this to your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 };

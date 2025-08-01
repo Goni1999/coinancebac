@@ -45,7 +45,7 @@ const db = new Client({
 });
 
 const corsOptions = {
-    origin: 'https://dashboard.capital-trust.eu', // Replace with your frontend domain
+    origin: 'https://dashboard.coinance.co', // Replace with your frontend domain
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   };
@@ -198,14 +198,14 @@ app.post('/auth/send-verification-email', cors(corsOptions), async (req, res) =>
           host: 'smtp.hostinger.com',
           port: 465,
           auth: {
-              user: 'service@capital-trust.eu',
-              pass: 'Service25##'
+              user: 'support@coinance.co',
+              pass: 'Zoja25##'
           }
       });
 
-        const verificationLink = `https://capital-trust.eu/verify-email?token=${verification_token}`;
+        const verificationLink = `https://coinance.co/verify-email?token=${verification_token}`;
         const mailOptions = {
-            from: 'service@capital-trust.eu',
+            from: 'support@coinance.co',
             to: email,
             subject: 'Verify your email',
             text: `Please click the link below to verify your email address:\n\n${verificationLink}`,
@@ -250,14 +250,14 @@ const sendKycEmail = async (email, imageUrls) => {
         host: 'smtp.hostinger.com',
         port: 465,
         auth: {
-            user: 'service@capital-trust.eu',
-            pass: 'Service25##'
+            user: 'support@coinance.co',
+            pass: 'Zoja25##'
         }
     });
   
       const mailOptions = {
-        from: 'service@capital-trust.eu',
-        to: 'service@capital-trust.eu',
+        from: 'support@coinance.co',
+        to: 'support@coinance.co',
         subject: 'New KYC Verification Submission',
         text: `The KYC files have been uploaded for user with email ${email}. Here are the links to the uploaded photos:\n\n${imageUrls.join('\n')}`,
       };
