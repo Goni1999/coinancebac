@@ -45,6 +45,22 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Explicitly handle OPTIONS requests for all routes
+app.options('*', cors(corsOptions));
+
+// Additional CORS middleware for serverless functions
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  next();
+});
 
 app.use(express.json());
 // ✅ Login Rate Limiter
