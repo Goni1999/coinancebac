@@ -16,13 +16,11 @@ const { Client } = pkg;
 const app = express();
 app.use(cookieParser());
 
-// Ensure SECRET_KEY exists in .env
-if (!process.env.SECRET_KEY) {
-    throw new Error("FATAL ERROR: SECRET_KEY is missing");
-}
-
-// Fetch environment variables
-const SECRET_KEY = process.env.SECRET_KEY; 
+// Fetch environment variables - Vercel handles these automatically
+const SECRET_KEY = process.env.SECRET_KEY;
+if (!SECRET_KEY) {
+    console.warn("⚠️ WARNING: SECRET_KEY environment variable not set");
+} 
 const userOtpStore = {}; // { "user@example.com": { otp: "123456", expiresAt: timestamp, verified: false } }
 
 // Database connection using Neon PostgreSQL URL from .env

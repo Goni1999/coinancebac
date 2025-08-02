@@ -20,7 +20,7 @@ const app = express();
 
 // Ensure SECRET_KEY exists in .env
 if (!process.env.SECRET_KEY) {
-    throw new Error("FATAL ERROR: SECRET_KEY is missing");
+    console.warn("⚠️ WARNING: SECRET_KEY environment variable not set");
 }
 cloudinary.config({
     cloud_name: 'dqysonzsh',
