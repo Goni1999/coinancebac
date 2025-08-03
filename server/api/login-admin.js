@@ -34,16 +34,33 @@ const db = new Client({
 });
 
 const corsOptionsAdmin = {
-  origin: ['https://admin.coinance.co'], // Allow both domains
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
+  origin: ['https://admin.coinance.co'], // Admin domain
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
   credentials: true, // Allow cookies and credentials to be sent
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 };
 
-
+// Handle OPTIONS requests first, before any other middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+  
+  // Set CORS headers for all requests
+  res.header('Access-Control-Allow-Origin', 'https://admin.coinance.co');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight OPTIONS requests
+  if (req.method === 'OPTIONS') {
+    console.log('OPTIONS request handled');
+    return res.status(200).end();
+  }
+  
+  next();
+});
 
 app.use(cors(corsOptionsAdmin));
-
 
 app.use(express.json());
 // ✅ Login Rate Limiter

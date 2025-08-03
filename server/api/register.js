@@ -45,14 +45,43 @@ const db = new Client({
 });
 
 const corsOptions = {
-    origin: 'https://dashboard.coinance.co', // Replace with your frontend domain
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific HTTP methods
+    origin: 'https://dashboard.coinance.co', // Dashboard domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allow specific headers
+    credentials: true, // Allow cookies and credentials to be sent
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
   };
+
+// Handle OPTIONS requests first, before any other middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+  
+  // Set CORS headers for all requests
+  res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight OPTIONS requests
+  if (req.method === 'OPTIONS') {
+    console.log('OPTIONS request handled');
+    return res.status(200).end();
+  }
+  
+  next();
+});
 
 app.use(cors(corsOptions));
 
 app.use(express.json());
+
+// Global error handler to ensure CORS headers on all responses
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(500).json({ message: 'Internal server error' });
+});
 
 // Connect to the PostgreSQL database
 const connectDB = async () => {
