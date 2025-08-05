@@ -88,11 +88,12 @@ const loginLimiter = rateLimit({
     }
   });
   const transporter = nodemailer.createTransport({
-          host: 'smtp.hostinger.com',
-          port: 465,
+          host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+          port: process.env.SMTP_PORT || 465,
+          secure: true, // Use SSL
           auth: {
-              user: 'support@coinance.co',
-              pass: 'Zoja25##'
+              user: process.env.SMTP_USER || 'support@coinance.co',
+              pass: process.env.SMTP_PASSWORD || 'Zoja25##'
           }
       });
 
@@ -121,8 +122,25 @@ const loginLimiter = rateLimit({
 const sendVerificationEmail = async (email, token) => {
     const verificationLink = `https://dashboard.coinance.co/emailverification?token=${token}`;
     
+    // Debug email configuration
+    console.log('📧 Email Configuration Debug:');
+    console.log('  SMTP_HOST:', process.env.SMTP_HOST || 'smtp.hostinger.com');
+    console.log('  SMTP_PORT:', process.env.SMTP_PORT || 465);
+    console.log('  SMTP_USER:', process.env.SMTP_USER || 'support@coinance.co');
+    console.log('  SMTP_PASSWORD set:', !!(process.env.SMTP_PASSWORD || 'Zoja25##'));
+    
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+        port: process.env.SMTP_PORT || 465,
+        secure: true, // Use SSL
+        auth: {
+            user: process.env.SMTP_USER || 'support@coinance.co',
+            pass: process.env.SMTP_PASSWORD || 'Zoja25##'
+        }
+    });
+    
     const mailOptions = {
-        from: "support@coinance.co",
+        from: process.env.SMTP_USER || "support@coinance.co",
         to: email,
         subject: "Verify Your Email - Coinance",
         html: `<p>Click the link below to verify your email:</p>
@@ -306,11 +324,12 @@ const sendOtpEmail = async (email, otp) => {
     
 
     const transporter = nodemailer.createTransport({
-        host: 'smtp.hostinger.com',
-        port: 465,
+        host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+        port: process.env.SMTP_PORT || 465,
+        secure: true, // Use SSL
         auth: {
-            user: 'support@coinance.co',
-            pass: 'Zoja25##'
+            user: process.env.SMTP_USER || 'support@coinance.co',
+            pass: process.env.SMTP_PASSWORD || 'Zoja25##'
         }
     });
   
@@ -481,11 +500,12 @@ app.post("/api/logout", cors(corsOptions), authenticateJWT , (req, res) => {
 const sendResetPassword = async (email, resetToken) => {
     const resetLink = `https://dashboard.coinance.co/resetpassword?token=${resetToken}`;
     const transporter = nodemailer.createTransport({
-      host: 'smtp.hostinger.com',
-      port: 465,
+      host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+      port: process.env.SMTP_PORT || 465,
+      secure: true, // Use SSL
       auth: {
-          user: 'support@coinance.co',
-          pass: 'Zoja25##'
+          user: process.env.SMTP_USER || 'support@coinance.co',
+          pass: process.env.SMTP_PASSWORD || 'Zoja25##'
       }
   });
     const mailOptions = {
@@ -636,11 +656,12 @@ app.post("/api/reset-password", cors(corsOptions), async (req, res) => {
   // Function to send a verification email
 const sendAccAction = async (email, action) => {
   const transporter = nodemailer.createTransport({
-    host: 'smtp.hostinger.com',
-    port: 465,
+    host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+    port: process.env.SMTP_PORT || 465,
+    secure: true, // Use SSL
     auth: {
-        user: 'support@coinance.co',
-        pass: 'Zoja25##'
+        user: process.env.SMTP_USER || 'support@coinance.co',
+        pass: process.env.SMTP_PASSWORD || 'Zoja25##'
     }
 });
   const mailOptions = {
