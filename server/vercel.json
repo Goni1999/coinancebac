@@ -67,6 +67,9 @@
      "dest": "/api/login.js"
    },
    {
+    
+   },
+   {
       
     "src": "/api/verify-otp",
    "dest": "/api/login.js"
@@ -412,6 +415,18 @@
 {
   "src": "/auth/save-kyc-admin",
   "dest": "/api/register-admin.js"
+},
+{
+  "src": "/api/admin-invoices-create",
+  "dest": "/api/login-admin.js"
+},
+{
+  "src": "/api/admin-invoices-update",
+  "dest": "/api/login-admin.js"
+},
+{
+  "src": "/api/admin-invoices-delete",
+  "dest": "/api/login-admin.js"
 }
   ]
 }
