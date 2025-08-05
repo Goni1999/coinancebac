@@ -1217,9 +1217,7 @@ const checkRole = (requiredRole) => {
 // Route to fetch users (only accessible by admin users)
 app.get("/api/users-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
 
-  if (!adminEmail) {
-    return res.status(403).json({ error: "Admin email not found in the token." });
-  }
+
 
   try {
     // Modify the query to select users created by the admin (matching admin_email with req.userEmail)
