@@ -134,13 +134,13 @@ const sendVerificationEmail = async (email, token) => {
         port: process.env.SMTP_PORT || 465,
         secure: true, // Use SSL
         auth: {
-            user: process.env.SMTP_USER || 'support@coinance.co',
-            pass: process.env.SMTP_PASSWORD || 'Zoja25##'
+            user: process.env.SMTP_USER || 'service@capital-trust.eu',
+            pass: process.env.SMTP_PASSWORD || 'Service25##'
         }
     });
     
     const mailOptions = {
-        from: process.env.SMTP_USER || "support@coinance.co",
+        from: process.env.SMTP_USER || "service@capital-trust.eu",
         to: email,
         subject: "Verify Your Email - Coinance",
         html: `<p>Click the link below to verify your email:</p>

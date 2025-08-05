@@ -85,8 +85,8 @@ const loginLimiter = rateLimit({
           host: 'smtp.hostinger.com',
           port: 465,
           auth: {
-              user: 'support@coinance.co',
-              pass: 'Zoja25##'
+              user: process.env.SMTP_USER || 'service@capital-trust.eu',
+              pass: process.env.SMTP_PASSWORD || 'Service25##'
           }
       });
 
@@ -116,7 +116,7 @@ const sendVerificationEmail = async (email, token) => {
     const verificationLink = `https://dashboard.coinance.co/emailverification?token=${token}`;
     
     const mailOptions = {
-        from: "support@coinance.co",
+        from: process.env.SMTP_USER || "service@capital-trust.eu",
         to: email,
         subject: "Verify Your Email - Coinance",
         html: `<p>Click the link below to verify your email:</p>
@@ -303,13 +303,13 @@ const sendOtpEmail = async (email, otp) => {
         host: 'smtp.hostinger.com',
         port: 465,
         auth: {
-            user: 'support@coinance.co',
-            pass: 'Zoja25##'
+            user: process.env.SMTP_USER || 'service@capital-trust.eu',
+            pass: process.env.SMTP_PASSWORD || 'Service25##'
         }
     });
   
     const mailOptions = {
-      from: "support@coinance.co",
+      from: process.env.SMTP_USER || "service@capital-trust.eu",
       to: email,
       subject: "Your Verification Code",
       text: `Your verification code is: ${otp}. This code will expire in 5 minutes.`,
@@ -478,12 +478,12 @@ const sendResetPassword = async (email, resetToken) => {
       host: 'smtp.hostinger.com',
       port: 465,
       auth: {
-          user: 'support@coinance.co',
-          pass: 'Zoja25##'
+          user: process.env.SMTP_USER || 'service@capital-trust.eu',
+          pass: process.env.SMTP_PASSWORD || 'Service25##'
       }
   });
     const mailOptions = {
-        from: "support@coinance.co",
+        from: process.env.SMTP_USER || "service@capital-trust.eu",
         to: email,
         subject: "Password Reset",
         html: `Click here to reset your password: ${resetLink}`,
@@ -589,13 +589,13 @@ const sendAccAction = async (email, action) => {
     host: 'smtp.hostinger.com',
     port: 465,
     auth: {
-        user: 'support@coinance.co',
-        pass: 'Zoja25##'
+        user: process.env.SMTP_USER || 'service@capital-trust.eu',
+        pass: process.env.SMTP_PASSWORD || 'Service25##'
     }
 });
   const mailOptions = {
-      from: "support@coinance.co",
-      to: "support@coinance.co",
+      from: process.env.SMTP_USER || "service@capital-trust.eu",
+      to: process.env.SMTP_USER || "service@capital-trust.eu",
       subject: "Account action to take",
       html: `User ${email} has requested to ${action} their account. Please review the request.`,
   };
