@@ -731,8 +731,8 @@ app.get('/api/balance-admin', cors(corsOptionsAdmin),  authenticateJWT, async (r
       WHERE  b.status = 'Active';
     `;
     
-    // Execute the query with the admin's email
-    const result = await db.query(query, [adminEmail]);
+    // Execute the query
+    const result = await db.query(query);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Balance not found for the admin\'s users' });
