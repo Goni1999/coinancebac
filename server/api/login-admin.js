@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer';
 import rateLimit from "express-rate-limit";
 import crypto from "crypto"; // ✅ Correct import
 import cookieParser from 'cookie-parser';
-import { db, connectDB } from './db.js';
+import { db } from './db.js';
 
 dotenv.config();
 const port = process.env.PORT || 5000;
@@ -69,6 +69,17 @@ const loginLimiter = rateLimit({
     message: "Too many login attempts, please try again later.",
     standardHeaders: true, // Return rate limit info in headers
     legacyHeaders: false, // Disable deprecated headers
+    // Configure for serverless environment
+    trustProxy: true,
+    keyGenerator: (req) => {
+        // Use x-forwarded-for or x-real-ip headers for rate limiting in serverless
+        return req.ip || req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
+    },
+    skip: (req) => {
+        // Skip rate limiting for localhost in development
+        const ip = req.ip || req.headers['x-forwarded-for'] || req.headers['x-real-ip'];
+        return ip === '127.0.0.1' || ip === '::1';
+    }
   });
   const transporter = nodemailer.createTransport({
           host: 'smtp.hostinger.com',

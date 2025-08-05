@@ -3,80 +3,84 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const { Client } = pkg;
+const { Client, Pool } = pkg;
 
-// Create a single database client instance
-const db = new Client({
+// Use connection pooling for serverless environments
+const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false,
     },
+    // Serverless-optimized settings
+    max: 1, // Maximum number of clients in the pool
+    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+    connectionTimeoutMillis: 10000, // Return an error if connection takes longer than 10 seconds
 });
 
 // Log database configuration (without sensitive info)
 console.log('🔧 Database configuration:');
 console.log('  - DATABASE_URL set:', !!process.env.DATABASE_URL);
 console.log('  - SSL enabled: true');
+console.log('  - Environment: Serverless (Pool-based)');
+
 if (!process.env.DATABASE_URL) {
     console.error('❌ ERROR: DATABASE_URL environment variable not set!');
 }
 
-let isConnected = false;
-let isConnecting = false;
+// Handle pool errors
+pool.on('error', (err) => {
+    console.error('❌ Unexpected error on idle client', err);
+});
 
-// Connect to the PostgreSQL database
-const connectDB = async () => {
-    if (isConnected) {
-        console.log('✅ Database already connected');
-        return db;
-    }
-    
-    if (isConnecting) {
-        console.log('⏳ Database connection in progress...');
-        // Wait for the connection to complete
-        while (isConnecting) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        return db;
-    }
-    
-    isConnecting = true;
-    
+// For serverless, we export the pool and a query function
+const query = async (text, params) => {
+    const start = Date.now();
     try {
-        await db.connect();
-        isConnected = true;
-        isConnecting = false;
-        console.log('✅ Connected to PostgreSQL');
-        return db;
+        const res = await pool.query(text, params);
+        const duration = Date.now() - start;
+        console.log('✅ Query executed', { duration, rows: res.rowCount });
+        return res;
     } catch (err) {
-        isConnecting = false;
-        console.error('Error connecting to PostgreSQL:', err);
-        setTimeout(() => {
-            isConnected = false;
-            connectDB();
-        }, 5000);
+        const duration = Date.now() - start;
+        console.error('❌ Query error', { duration, error: err.message });
         throw err;
     }
 };
 
-// Initialize connection
-connectDB().catch(console.error);
+// For backwards compatibility, create a db object that mimics the Client interface
+const db = {
+    query: query,
+    end: () => pool.end(),
+    // Add connect method for compatibility, but it's a no-op with pools
+    connect: () => Promise.resolve(),
+};
+
+// Test connection on startup
+const testConnection = async () => {
+    try {
+        await query('SELECT NOW() as current_time');
+        console.log('✅ Database connection test successful');
+    } catch (err) {
+        console.error('❌ Database connection test failed:', err.message);
+    }
+};
+
+// Test connection immediately
+testConnection();
 
 // Handle process termination
 process.on('SIGINT', async () => {
-    if (isConnected) {
-        await db.end();
-        console.log('Database connection closed.');
-    }
+    console.log('🔄 Closing database pool...');
+    await pool.end();
+    console.log('✅ Database pool closed');
     process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-    if (isConnected) {
-        await db.end();
-        console.log('Database connection closed.');
-    }
+    console.log('🔄 Closing database pool...');
+    await pool.end();
+    console.log('✅ Database pool closed');
     process.exit(0);
 });
 
-export { db, connectDB }; 
+export { db, query, pool }; 

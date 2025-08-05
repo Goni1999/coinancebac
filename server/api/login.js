@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer';
 import rateLimit from "express-rate-limit";
 import crypto from "crypto"; // ✅ Correct import
 import cookieParser from 'cookie-parser';
-import { db, connectDB } from './db.js';
+import { db } from './db.js';
 
 dotenv.config();
 const port = process.env.PORT || 5000;
@@ -75,6 +75,17 @@ const loginLimiter = rateLimit({
     message: "Too many login attempts, please try again later.",
     standardHeaders: true, // Return rate limit info in headers
     legacyHeaders: false, // Disable deprecated headers
+    // Configure for serverless environment
+    trustProxy: true,
+    keyGenerator: (req) => {
+        // Use x-forwarded-for or x-real-ip headers for rate limiting in serverless
+        return req.ip || req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
+    },
+    skip: (req) => {
+        // Skip rate limiting for localhost in development
+        const ip = req.ip || req.headers['x-forwarded-for'] || req.headers['x-real-ip'];
+        return ip === '127.0.0.1' || ip === '::1';
+    }
   });
   const transporter = nodemailer.createTransport({
           host: 'smtp.hostinger.com',
@@ -493,7 +504,6 @@ const sendResetPassword = async (email, resetToken) => {
 
 app.post("/api/request-password-reset", cors(corsOptions), async (req, res) => {
   console.log("Password reset endpoint called with:", req.method, req.url);
-  console.log("Request headers:", req.headers);
   
   // Ensure CORS headers are always set
   res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
@@ -511,45 +521,71 @@ app.post("/api/request-password-reset", cors(corsOptions), async (req, res) => {
   }
   
   try {
-      // Check if user exists
-      const user = await db.query("SELECT id FROM users WHERE email = $1", [email]);
+      // Start timer for timeout handling
+      const startTime = Date.now();
+      
+      // Check if user exists with timeout
+      const userPromise = db.query("SELECT id FROM users WHERE email = $1", [email]);
+      const user = await Promise.race([
+          userPromise,
+          new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Database query timeout')), 10000)
+          )
+      ]);
+      
       if (user.rowCount === 0) {
           return res.status(404).json({ message: "User not found" });
       }
-
 
       // Generate secure token
       const resetToken = crypto.randomBytes(32).toString("hex");
       const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); 
 
-      console.log("Token:", resetToken);
-      console.log("Hashed Token:", hashedToken);
-      console.log("Expiry:", expiresAt);
+      console.log("Generated token for password reset");
 
-      // Store token in DB
-      const updateResult = await db.query(
+      // Store token in DB with timeout
+      const updatePromise = db.query(
           "UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE email = $3 RETURNING *",
           [hashedToken, expiresAt, email]
       );
+      
+      const updateResult = await Promise.race([
+          updatePromise,
+          new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Database update timeout')), 10000)
+          )
+      ]);
 
       if (updateResult.rowCount === 0) {
           return res.status(500).json({ message: "Failed to update reset token" });
       }
 
-
-      // Send reset email
-      await sendResetPassword(email, resetToken);
-
-      console.log("Email sent successfully.");
+      // Send response first to avoid timeout, then send email asynchronously
       res.json({ message: "Password reset email sent" });
+      
+      // Send email asynchronously without blocking response
+      setImmediate(async () => {
+          try {
+              await sendResetPassword(email, resetToken);
+              console.log("✅ Password reset email sent successfully");
+          } catch (emailError) {
+              console.error("❌ Email sending failed:", emailError.message);
+              // Don't throw error since response was already sent
+          }
+      });
 
   } catch (error) {
       console.error("❌ Password reset error:", error);
       // Ensure CORS headers on error responses
       res.header('Access-Control-Allow-Origin', 'https://dashboard.coinance.co');
       res.header('Access-Control-Allow-Credentials', 'true');
-      res.status(500).json({ message: "Server error", error: error.message });
+      
+      if (error.message.includes('timeout')) {
+          res.status(408).json({ message: "Request timeout, please try again" });
+      } else {
+          res.status(500).json({ message: "Server error", error: error.message });
+      }
   }
 });
 

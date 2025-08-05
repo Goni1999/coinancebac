@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { db, connectDB } from './db.js';
+import { db } from './db.js';
 
 dotenv.config();
 const port = process.env.PORT || 5000;

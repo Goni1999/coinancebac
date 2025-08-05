@@ -9,7 +9,7 @@ import multer from 'multer'; // Use import
 import path from 'path'; // Use import
 import fs from 'fs'; // Use import
 import cloudinary from 'cloudinary';
-import { db, connectDB } from './db.js';
+import { db } from './db.js';
 
 dotenv.config();
 const port = process.env.PORT || 5000;
