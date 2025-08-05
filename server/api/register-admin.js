@@ -1,6 +1,5 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import pkg from 'pg';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
@@ -10,11 +9,10 @@ import multer from 'multer'; // Use import
 import path from 'path'; // Use import
 import fs from 'fs'; // Use import
 import cloudinary from 'cloudinary';
+import { db, connectDB } from './db.js';
 
 dotenv.config();
 const port = process.env.PORT || 5000;
-
-const { Client } = pkg;
 
 const app = express();
 
@@ -36,13 +34,7 @@ const EMAIL_PORT = process.env.EMAIL_PORT;
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 const FRONTEND_URL = process.env.FRONTEND_URL;
-// Database connection using Neon PostgreSQL URL from .env
-const db = new Client({
-    connectionString: process.env.DATABASE_URL, // Use DATABASE_URL from .env
-    ssl: {
-        rejectUnauthorized: false, // Necessary for SSL connections with Neon
-    },
-});
+
 
 const corsOptionsAdmin = {
     origin: 'https://admin.coinance.co', // Admin domain
@@ -75,18 +67,7 @@ app.use(cors(corsOptionsAdmin));
 
 app.use(express.json());
 
-// Connect to the PostgreSQL database
-const connectDB = async () => {
-    try {
-        await db.connect(); // Connect to the Neon PostgreSQL DB
-        console.log('✅ Connected to PostgreSQL');
-    } catch (err) {
-        console.error('Error connecting to PostgreSQL:', err);
-        setTimeout(connectDB, 5000); // Retry after 5 seconds
-    }
-};
 
-connectDB();
 
 
   

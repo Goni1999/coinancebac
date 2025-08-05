@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-import { Client } from 'pg';
 import dotenv from 'dotenv';
+import { db, connectDB } from './db.js';
 
 dotenv.config();
 const port = process.env.PORT || 5000;
@@ -17,14 +17,6 @@ if (!process.env.SECRET_KEY) {
 // Fetch environment variables
 const SECRET_KEY = process.env.SECRET_KEY;
 
-// Database connection using Neon PostgreSQL URL from .env
-const db = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false,
-    },
-});
-
 const corsOptions = {
     origin: 'https://coinance.co', // Update this to your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -32,21 +24,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
-
-// Connect to the PostgreSQL database
-const connectDB = async () => {
-    try {
-        await db.connect();
-        console.log('✅ Connected to PostgreSQL');
-    } catch (err) {
-        console.error('Error connecting to PostgreSQL:', err);
-        setTimeout(connectDB, 5000); // Retry after 5 seconds
-    }
-};
-
-connectDB();
 
 // JWT Authentication Middleware
 const authenticateJWT = (req, res, next) => {

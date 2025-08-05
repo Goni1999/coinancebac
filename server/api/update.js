@@ -1,15 +1,13 @@
 
   import express from 'express';
-  import cors from 'cors';
-  import bcrypt from 'bcryptjs';
-  import jwt from 'jsonwebtoken';
-  import pkg from 'pg';
-  import dotenv from 'dotenv';
-  
-  dotenv.config();
-  const port = process.env.PORT || 5000;
-  
-  const { Client } = pkg;
+import cors from 'cors';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import { db, connectDB } from './db.js';
+
+dotenv.config();
+const port = process.env.PORT || 5000;
   
   const app = express();
   
@@ -21,13 +19,7 @@
   // Fetch environment variables
   const SECRET_KEY = process.env.SECRET_KEY; 
   
-  // Database connection using Neon PostgreSQL URL from .env
-  const db = new Client({
-      connectionString: process.env.DATABASE_URL, // Use DATABASE_URL from .env
-      ssl: {
-          rejectUnauthorized: false, // Necessary for SSL connections with Neon
-      },
-  });
+  
   
   const corsOptions = {
       origin: 'https://coinance.co', // Replace with your frontend domain
@@ -39,18 +31,7 @@
   
   app.use(express.json());
   
-  // Connect to the PostgreSQL database
-  const connectDB = async () => {
-      try {
-          await db.connect(); // Connect to the Neon PostgreSQL DB
-          console.log('✅ Connected to PostgreSQL');
-      } catch (err) {
-          console.error('Error connecting to PostgreSQL:', err);
-          setTimeout(connectDB, 5000); // Retry after 5 seconds
-      }
-  };
   
-  connectDB();
   
   // JWT Authentication Middleware
   const authenticateJWT = (req, res, next) => {
