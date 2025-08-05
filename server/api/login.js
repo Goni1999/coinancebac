@@ -13,6 +13,10 @@ dotenv.config();
 const port = process.env.PORT || 5000;
 
 const app = express();
+
+// Trust proxy for rate limiting when behind proxy (Vercel, etc.)
+app.set('trust proxy', true);
+
 app.use(cookieParser());
 
 // Fetch environment variables - Vercel handles these automatically

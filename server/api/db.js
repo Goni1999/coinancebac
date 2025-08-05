@@ -13,6 +13,14 @@ const db = new Client({
     },
 });
 
+// Log database configuration (without sensitive info)
+console.log('🔧 Database configuration:');
+console.log('  - DATABASE_URL set:', !!process.env.DATABASE_URL);
+console.log('  - SSL enabled: true');
+if (!process.env.DATABASE_URL) {
+    console.error('❌ ERROR: DATABASE_URL environment variable not set!');
+}
+
 let isConnected = false;
 let isConnecting = false;
 
