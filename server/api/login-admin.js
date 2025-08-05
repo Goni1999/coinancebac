@@ -768,12 +768,11 @@ app.get('/api/admin-transactions', cors(corsOptionsAdmin),  authenticateJWT, asy
         t.details, 
         t.admin_email
       FROM transactions t
-      JOIN users u ON u.id = t.user_id
-      WHERE u.admin_email = $1;
+      JOIN users u ON u.id = t.user_id;
     `;
     
-    // Execute the query with the admin's email
-    const result = await db.query(query, [adminEmail]);
+    // Execute the query
+    const result = await db.query(query);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'No transactions found for the admin\'s users' });
