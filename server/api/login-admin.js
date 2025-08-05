@@ -655,7 +655,207 @@ app.get("/api/transactions-admin", cors(corsOptionsAdmin),  authenticateJWT, asy
   }
 });
 
+// 2. Get all invoices (admin) - Used to fetch all invoices
+app.get("/api/invoices-admin", cors(corsOptionsAdmin), authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.userId; // Extracted from JWT
+    
+    // Verify admin role (you might want to add role checking here)
+    
+    // Fetch all invoices
+    const invoicesQuery = `
+      SELECT id, user_id, issued_date, sub_total, vat, total, link_of_pdf, status
+      FROM invoices 
+      ORDER BY issued_date DESC`;
 
+    const result = await db.query(invoicesQuery);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "No invoices found" });
+    }
+
+    // Return the invoices list
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// 3. Create new invoice (admin) - Used to add new invoices
+app.post("/api/admin-invoices-create", cors(corsOptionsAdmin), authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.userId; // Extracted from JWT
+    const { id, user_id, issued_date, sub_total, vat, link_of_pdf, status } = req.body;
+    
+    // Verify admin role (you might want to add role checking here)
+    
+    // Validate required fields
+    if (!id || !user_id || !issued_date || !sub_total || vat === undefined) {
+      return res.status(400).json({ error: "Missing required fields: id, user_id, issued_date, sub_total, vat" });
+    }
+
+    // Calculate total (sub_total + VAT)
+    const total = parseFloat(sub_total) + (parseFloat(sub_total) * parseFloat(vat) / 100);
+
+    // Insert new invoice
+    const insertQuery = `
+      INSERT INTO invoices (id, user_id, issued_date, sub_total, vat, total, link_of_pdf, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING *`;
+
+    const values = [id, user_id, issued_date, sub_total, vat, total, link_of_pdf || '', status || 'unpaid'];
+    const result = await db.query(insertQuery, values);
+
+    if (result.rows.length === 0) {
+      return res.status(500).json({ error: "Failed to create invoice" });
+    }
+
+    // Return the created invoice
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error creating invoice:", error);
+    if (error.code === '23505') { // Unique constraint violation
+      res.status(400).json({ error: "Invoice ID already exists" });
+    } else if (error.code === '23503') { // Foreign key constraint violation
+      res.status(400).json({ error: "Invalid user_id" });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+});
+
+// 4. Update invoice (admin) - Used to edit existing invoices
+app.put("/api/admin-invoices-update", cors(corsOptionsAdmin), authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.userId; // Extracted from JWT
+    const { id, user_id, issued_date, sub_total, vat, link_of_pdf, status } = req.body;
+    
+    // Verify admin role (you might want to add role checking here)
+    
+    // Validate required fields
+    if (!id) {
+      return res.status(400).json({ error: "Invoice ID is required" });
+    }
+
+    // Check if invoice exists
+    const checkQuery = `SELECT id FROM invoices WHERE id = $1`;
+    const checkResult = await db.query(checkQuery, [id]);
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    // Calculate total if sub_total and vat are provided
+    let total = null;
+    if (sub_total !== undefined && vat !== undefined) {
+      total = parseFloat(sub_total) + (parseFloat(sub_total) * parseFloat(vat) / 100);
+    }
+
+    // Build dynamic update query
+    const updateFields = [];
+    const values = [];
+    let paramCount = 1;
+
+    if (user_id !== undefined) {
+      updateFields.push(`user_id = $${paramCount++}`);
+      values.push(user_id);
+    }
+    if (issued_date !== undefined) {
+      updateFields.push(`issued_date = $${paramCount++}`);
+      values.push(issued_date);
+    }
+    if (sub_total !== undefined) {
+      updateFields.push(`sub_total = $${paramCount++}`);
+      values.push(sub_total);
+    }
+    if (vat !== undefined) {
+      updateFields.push(`vat = $${paramCount++}`);
+      values.push(vat);
+    }
+    if (total !== null) {
+      updateFields.push(`total = $${paramCount++}`);
+      values.push(total);
+    }
+    if (link_of_pdf !== undefined) {
+      updateFields.push(`link_of_pdf = $${paramCount++}`);
+      values.push(link_of_pdf);
+    }
+    if (status !== undefined) {
+      updateFields.push(`status = $${paramCount++}`);
+      values.push(status);
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ error: "No fields to update" });
+    }
+
+    // Add WHERE clause parameter
+    values.push(id);
+    
+    const updateQuery = `
+      UPDATE invoices 
+      SET ${updateFields.join(', ')} 
+      WHERE id = $${paramCount}
+      RETURNING *`;
+
+    const result = await db.query(updateQuery, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Invoice not found or update failed" });
+    }
+
+    // Return the updated invoice
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error updating invoice:", error);
+    if (error.code === '23503') { // Foreign key constraint violation
+      res.status(400).json({ error: "Invalid user_id" });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+});
+
+// 5. Delete invoice (admin) - Used to remove invoices
+app.post("/api/admin-invoices-delete", cors(corsOptionsAdmin), authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.userId; // Extracted from JWT
+    const { id } = req.body;
+    
+    // Verify admin role (you might want to add role checking here)
+    
+    // Validate required fields
+    if (!id) {
+      return res.status(400).json({ error: "Invoice ID is required" });
+    }
+
+    // Check if invoice exists before deletion
+    const checkQuery = `SELECT id FROM invoices WHERE id = $1`;
+    const checkResult = await db.query(checkQuery, [id]);
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    // Delete the invoice
+    const deleteQuery = `DELETE FROM invoices WHERE id = $1 RETURNING *`;
+    const result = await db.query(deleteQuery, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Invoice not found or deletion failed" });
+    }
+
+    // Return success message with deleted invoice info
+    res.json({ 
+      message: "Invoice deleted successfully", 
+      deleted_invoice: result.rows[0] 
+    });
+  } catch (error) {
+    console.error("Error deleting invoice:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 
 app.put("/api/update-user-data-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
