@@ -728,7 +728,7 @@ app.get('/api/balance-admin', cors(corsOptionsAdmin),  authenticateJWT, async (r
        b.user_id, b.bitcoin, b.ethereum, b.xrp, b.tether, b.bnb, b.solana, b.usdc, b.dogecoin, b.cardano, b.staked_ether, b.balance_id, b.deposit_wallet, b.unpaid_amount, b.usdt_total
       FROM balance b
       JOIN users u ON u.id = b.user_id
-      WHERE u.admin_email = $1 AND b.status = 'Active';
+      WHERE  b.status = 'Active';
     `;
     
     // Execute the query with the admin's email
@@ -1216,7 +1216,6 @@ const checkRole = (requiredRole) => {
 
 // Route to fetch users (only accessible by admin users)
 app.get("/api/users-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
-  const adminEmail = req.userEmail; // Get the admin's email from the JWT
 
   if (!adminEmail) {
     return res.status(403).json({ error: "Admin email not found in the token." });
@@ -1224,7 +1223,7 @@ app.get("/api/users-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req
 
   try {
     // Modify the query to select users created by the admin (matching admin_email with req.userEmail)
-    const result = await db.query("SELECT * FROM users WHERE admin_email = $1", [adminEmail]);
+    const result = await db.query("SELECT * FROM users ");
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "No users found for this admin." });
