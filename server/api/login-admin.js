@@ -1470,7 +1470,7 @@ app.get("/api/users-admin", cors(corsOptionsAdmin),  authenticateJWT, async (req
 });
 
 
-app.put("/api/users-admin", cors(corsOptionsAdmin),  async (req, res) => {
+app.put("/api/users-admin", cors(corsOptionsAdmin), async (req, res) => {
   try {
     const {
       email, // Get the email from the request body
@@ -1503,82 +1503,83 @@ app.put("/api/users-admin", cors(corsOptionsAdmin),  async (req, res) => {
     // Prepare the SQL query dynamically based on which fields are provided
     const fieldsToUpdate = [];
     const values = [];
+    let paramCount = 1; // Dynamic parameter counter
 
     // Add fields that are provided in the request body
-    if (first_name) {
-      fieldsToUpdate.push("first_name = $1");
+    if (first_name !== undefined) {
+      fieldsToUpdate.push(`first_name = $${paramCount++}`);
       values.push(first_name);
     }
-    if (last_name) {
-      fieldsToUpdate.push("last_name = $2");
+    if (last_name !== undefined) {
+      fieldsToUpdate.push(`last_name = $${paramCount++}`);
       values.push(last_name);
     }
-    if (date_of_birth) {
-      fieldsToUpdate.push("date_of_birth = $3");
+    if (date_of_birth !== undefined) {
+      fieldsToUpdate.push(`date_of_birth = $${paramCount++}`);
       values.push(date_of_birth);
     }
-    if (phone) {
-      fieldsToUpdate.push("phone = $4");
+    if (phone !== undefined) {
+      fieldsToUpdate.push(`phone = $${paramCount++}`);
       values.push(phone);
     }
-    if (address) {
-      fieldsToUpdate.push("address = $5");
+    if (address !== undefined) {
+      fieldsToUpdate.push(`address = $${paramCount++}`);
       values.push(address);
     }
-    if (city) {
-      fieldsToUpdate.push("city = $6");
+    if (city !== undefined) {
+      fieldsToUpdate.push(`city = $${paramCount++}`);
       values.push(city);
     }
-    if (state) {
-      fieldsToUpdate.push("state = $7");
+    if (state !== undefined) {
+      fieldsToUpdate.push(`state = $${paramCount++}`);
       values.push(state);
     }
-    if (zip_code) {
-      fieldsToUpdate.push("zip_code = $8");
+    if (zip_code !== undefined) {
+      fieldsToUpdate.push(`zip_code = $${paramCount++}`);
       values.push(zip_code);
     }
-    if (role) {
-      fieldsToUpdate.push("role = $9");
+    if (role !== undefined) {
+      fieldsToUpdate.push(`role = $${paramCount++}`);
       values.push(role);
     }
-    if (gender) {
-      fieldsToUpdate.push("gender = $10");
+    if (gender !== undefined) {
+      fieldsToUpdate.push(`gender = $${paramCount++}`);
       values.push(gender);
     }
-    if (card_id) {
-      fieldsToUpdate.push("card_id = $11");
+    if (card_id !== undefined) {
+      fieldsToUpdate.push(`card_id = $${paramCount++}`);
       values.push(card_id);
     }
-    if (position) {
-      fieldsToUpdate.push("position = $12");
+    if (position !== undefined) {
+      fieldsToUpdate.push(`position = $${paramCount++}`);
       values.push(position);
     }
-    if (two_factor_enabled) {
-      fieldsToUpdate.push("two_factor_enabled = $13");
+    if (two_factor_enabled !== undefined) {
+      fieldsToUpdate.push(`two_factor_enabled = $${paramCount++}`);
       values.push(two_factor_enabled);
     }
-    if (kyc_verification) {
-      fieldsToUpdate.push("kyc_verification = $14");
+    if (kyc_verification !== undefined) {
+      fieldsToUpdate.push(`kyc_verification = $${paramCount++}`);
       values.push(kyc_verification);
     }
-    if (identification_documents_type) {
-      fieldsToUpdate.push("identification_documents_type = $15");
+    if (identification_documents_type !== undefined) {
+      fieldsToUpdate.push(`identification_documents_type = $${paramCount++}`);
       values.push(identification_documents_type);
     }
-    if (facebook_link) {
-      fieldsToUpdate.push("facebook_link = $16");
+    if (facebook_link !== undefined) {
+      fieldsToUpdate.push(`facebook_link = $${paramCount++}`);
       values.push(facebook_link);
     }
-    if (linkedin_link) {
-      fieldsToUpdate.push("linkedin_link = $17");
+    if (linkedin_link !== undefined) {
+      fieldsToUpdate.push(`linkedin_link = $${paramCount++}`);
       values.push(linkedin_link);
     }
-    if (instagram_link) {
-      fieldsToUpdate.push("instagram_link = $18");
+    if (instagram_link !== undefined) {
+      fieldsToUpdate.push(`instagram_link = $${paramCount++}`);
       values.push(instagram_link);
     }
-    if (xcom_link) {
-      fieldsToUpdate.push("xcom_link = $19");
+    if (xcom_link !== undefined) {
+      fieldsToUpdate.push(`xcom_link = $${paramCount++}`);
       values.push(xcom_link);
     }
 
@@ -1594,9 +1595,12 @@ app.put("/api/users-admin", cors(corsOptionsAdmin),  async (req, res) => {
     const updateQuery = `
       UPDATE users
       SET ${fieldsToUpdate.join(", ")}
-      WHERE email = $${values.length}
+      WHERE email = $${paramCount}
       RETURNING *;
     `;
+
+    console.log("Update Query:", updateQuery); // Debug log
+    console.log("Values:", values); // Debug log
 
     // Execute the update query
     const result = await db.query(updateQuery, values);
@@ -1609,11 +1613,10 @@ app.put("/api/users-admin", cors(corsOptionsAdmin),  async (req, res) => {
     // Return the updated user
     res.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    console.error("Error updating user:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 app.post('/api/admin-transactions-delete', cors(corsOptionsAdmin),  authenticateJWT, async (req, res) => {
   const { transaction_id } = req.body; // Get transactionId from request body
 
