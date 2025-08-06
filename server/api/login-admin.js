@@ -695,6 +695,22 @@ app.post("/api/admin-invoices-create", cors(corsOptionsAdmin), authenticateJWT, 
       return res.status(400).json({ error: "Missing required fields: id, user_id, issued_date, sub_total, vat" });
     }
 
+    // Validate ID range for PostgreSQL integer type (-2,147,483,648 to 2,147,483,647)
+    const idNumber = parseInt(id);
+    if (isNaN(idNumber) || idNumber < -2147483648 || idNumber > 2147483647) {
+      return res.status(400).json({ 
+        error: "ID must be a valid integer between -2,147,483,648 and 2,147,483,647. Current value exceeds PostgreSQL integer range." 
+      });
+    }
+
+    // Validate user_id range as well
+    const userIdNumber = parseInt(user_id);
+    if (isNaN(userIdNumber) || userIdNumber < -2147483648 || userIdNumber > 2147483647) {
+      return res.status(400).json({ 
+        error: "User ID must be a valid integer between -2,147,483,648 and 2,147,483,647." 
+      });
+    }
+
     // Note: total is a generated column in the database (auto-calculated from sub_total and vat)
 
     // Insert new invoice (excluding total as it's a generated column)
@@ -735,6 +751,24 @@ app.put("/api/admin-invoices-update", cors(corsOptionsAdmin), authenticateJWT, a
     // Validate required fields
     if (!id) {
       return res.status(400).json({ error: "Invoice ID is required" });
+    }
+
+    // Validate ID range for PostgreSQL integer type
+    const idNumber = parseInt(id);
+    if (isNaN(idNumber) || idNumber < -2147483648 || idNumber > 2147483647) {
+      return res.status(400).json({ 
+        error: "ID must be a valid integer between -2,147,483,648 and 2,147,483,647. Current value exceeds PostgreSQL integer range." 
+      });
+    }
+
+    // Validate user_id range if provided
+    if (user_id !== undefined) {
+      const userIdNumber = parseInt(user_id);
+      if (isNaN(userIdNumber) || userIdNumber < -2147483648 || userIdNumber > 2147483647) {
+        return res.status(400).json({ 
+          error: "User ID must be a valid integer between -2,147,483,648 and 2,147,483,647." 
+        });
+      }
     }
 
     // Check if invoice exists
@@ -821,6 +855,14 @@ app.post("/api/admin-invoices-delete", cors(corsOptionsAdmin), authenticateJWT, 
     // Validate required fields
     if (!id) {
       return res.status(400).json({ error: "Invoice ID is required" });
+    }
+
+    // Validate ID range for PostgreSQL integer type
+    const idNumber = parseInt(id);
+    if (isNaN(idNumber) || idNumber < -2147483648 || idNumber > 2147483647) {
+      return res.status(400).json({ 
+        error: "ID must be a valid integer between -2,147,483,648 and 2,147,483,647. Current value exceeds PostgreSQL integer range." 
+      });
     }
 
     // Check if invoice exists before deletion
