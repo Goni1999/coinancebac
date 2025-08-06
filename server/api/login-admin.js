@@ -695,16 +695,15 @@ app.post("/api/admin-invoices-create", cors(corsOptionsAdmin), authenticateJWT, 
       return res.status(400).json({ error: "Missing required fields: id, user_id, issued_date, sub_total, vat" });
     }
 
-    // Calculate total (sub_total + VAT)
-    const total = parseFloat(sub_total) + (parseFloat(sub_total) * parseFloat(vat) / 100);
+    // Note: total is a generated column in the database (auto-calculated from sub_total and vat)
 
-    // Insert new invoice
+    // Insert new invoice (excluding total as it's a generated column)
     const insertQuery = `
-      INSERT INTO invoices (id, user_id, issued_date, sub_total, vat, total, link_of_pdf, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO invoices (id, user_id, issued_date, sub_total, vat, link_of_pdf, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *`;
 
-    const values = [id, user_id, issued_date, sub_total, vat, total, link_of_pdf || '', status || 'unpaid'];
+    const values = [id, user_id, issued_date, sub_total, vat, link_of_pdf || '', status || 'unpaid'];
     const result = await db.query(insertQuery, values);
 
     if (result.rows.length === 0) {
@@ -746,11 +745,8 @@ app.put("/api/admin-invoices-update", cors(corsOptionsAdmin), authenticateJWT, a
       return res.status(404).json({ error: "Invoice not found" });
     }
 
-    // Calculate total if sub_total and vat are provided
-    let total = null;
-    if (sub_total !== undefined && vat !== undefined) {
-      total = parseFloat(sub_total) + (parseFloat(sub_total) * parseFloat(vat) / 100);
-    }
+    // Note: total is a generated column in the database (auto-calculated from sub_total and vat)
+    // So we don't manually set it in updates
 
     // Build dynamic update query
     const updateFields = [];
@@ -773,10 +769,7 @@ app.put("/api/admin-invoices-update", cors(corsOptionsAdmin), authenticateJWT, a
       updateFields.push(`vat = $${paramCount++}`);
       values.push(vat);
     }
-    if (total !== null) {
-      updateFields.push(`total = $${paramCount++}`);
-      values.push(total);
-    }
+    // Removed total field - it's a generated column
     if (link_of_pdf !== undefined) {
       updateFields.push(`link_of_pdf = $${paramCount++}`);
       values.push(link_of_pdf);
