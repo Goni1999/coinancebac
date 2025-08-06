@@ -695,19 +695,19 @@ app.post("/api/admin-invoices-create", cors(corsOptionsAdmin), authenticateJWT, 
       return res.status(400).json({ error: "Missing required fields: id, user_id, issued_date, sub_total, vat" });
     }
 
-    // Validate ID range for PostgreSQL integer type (-2,147,483,648 to 2,147,483,647)
+    // Validate ID range (using JavaScript safe integer limits for PostgreSQL BIGINT compatibility)
     const idNumber = parseInt(id);
-    if (isNaN(idNumber) || idNumber < -2147483648 || idNumber > 2147483647) {
+    if (isNaN(idNumber) || idNumber < Number.MIN_SAFE_INTEGER || idNumber > Number.MAX_SAFE_INTEGER) {
       return res.status(400).json({ 
-        error: "ID must be a valid integer between -2,147,483,648 and 2,147,483,647. Current value exceeds PostgreSQL integer range." 
+        error: "ID must be a valid integer within JavaScript safe range (-9,007,199,254,740,991 to 9,007,199,254,740,991)." 
       });
     }
 
     // Validate user_id range as well
     const userIdNumber = parseInt(user_id);
-    if (isNaN(userIdNumber) || userIdNumber < -2147483648 || userIdNumber > 2147483647) {
+    if (isNaN(userIdNumber) || userIdNumber < Number.MIN_SAFE_INTEGER || userIdNumber > Number.MAX_SAFE_INTEGER) {
       return res.status(400).json({ 
-        error: "User ID must be a valid integer between -2,147,483,648 and 2,147,483,647." 
+        error: "User ID must be a valid integer within JavaScript safe range." 
       });
     }
 
@@ -753,20 +753,20 @@ app.put("/api/admin-invoices-update", cors(corsOptionsAdmin), authenticateJWT, a
       return res.status(400).json({ error: "Invoice ID is required" });
     }
 
-    // Validate ID range for PostgreSQL integer type
+    // Validate ID range (using JavaScript safe integer limits for PostgreSQL BIGINT compatibility)
     const idNumber = parseInt(id);
-    if (isNaN(idNumber) || idNumber < -2147483648 || idNumber > 2147483647) {
+    if (isNaN(idNumber) || idNumber < Number.MIN_SAFE_INTEGER || idNumber > Number.MAX_SAFE_INTEGER) {
       return res.status(400).json({ 
-        error: "ID must be a valid integer between -2,147,483,648 and 2,147,483,647. Current value exceeds PostgreSQL integer range." 
+        error: "ID must be a valid integer within JavaScript safe range (-9,007,199,254,740,991 to 9,007,199,254,740,991)." 
       });
     }
 
     // Validate user_id range if provided
     if (user_id !== undefined) {
       const userIdNumber = parseInt(user_id);
-      if (isNaN(userIdNumber) || userIdNumber < -2147483648 || userIdNumber > 2147483647) {
+      if (isNaN(userIdNumber) || userIdNumber < Number.MIN_SAFE_INTEGER || userIdNumber > Number.MAX_SAFE_INTEGER) {
         return res.status(400).json({ 
-          error: "User ID must be a valid integer between -2,147,483,648 and 2,147,483,647." 
+          error: "User ID must be a valid integer within JavaScript safe range." 
         });
       }
     }
@@ -857,11 +857,11 @@ app.post("/api/admin-invoices-delete", cors(corsOptionsAdmin), authenticateJWT, 
       return res.status(400).json({ error: "Invoice ID is required" });
     }
 
-    // Validate ID range for PostgreSQL integer type
+    // Validate ID range (using JavaScript safe integer limits for PostgreSQL BIGINT compatibility)
     const idNumber = parseInt(id);
-    if (isNaN(idNumber) || idNumber < -2147483648 || idNumber > 2147483647) {
+    if (isNaN(idNumber) || idNumber < Number.MIN_SAFE_INTEGER || idNumber > Number.MAX_SAFE_INTEGER) {
       return res.status(400).json({ 
-        error: "ID must be a valid integer between -2,147,483,648 and 2,147,483,647. Current value exceeds PostgreSQL integer range." 
+        error: "ID must be a valid integer within JavaScript safe range (-9,007,199,254,740,991 to 9,007,199,254,740,991)." 
       });
     }
 
