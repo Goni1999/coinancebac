@@ -1586,9 +1586,8 @@ app.post('/api/admin-transactions-delete', cors(corsOptionsAdmin),  authenticate
        USING users u
        WHERE b.transaction_id = $1
          AND b.user_id = u.id
-         AND u.admin_email = $2
        RETURNING b.*`,
-      [transaction_id, req.userEmail]  // Pass transaction_id and admin_email
+      [transaction_id]  // Pass transaction_id and admin_email
     );
 
     if (result.rowCount === 0) {
