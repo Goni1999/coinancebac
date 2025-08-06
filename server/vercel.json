@@ -67,9 +67,6 @@
      "dest": "/api/login.js"
    },
    {
-    
-   },
-   {
       
     "src": "/api/verify-otp",
    "dest": "/api/login.js"
