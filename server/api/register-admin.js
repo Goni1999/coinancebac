@@ -198,14 +198,14 @@ app.post('/auth/send-verification-email-admin', cors(corsOptionsAdmin), async (r
           host: 'smtp.hostinger.com',
           port: 465,
           auth: {
-              user: process.env.SMTP_USER || 'service@capital-trust.eu',
-              pass: process.env.SMTP_PASSWORD || 'Service25##'
+              user: process.env.SMTP_USER || 'info@coinance.co',
+              pass: process.env.SMTP_PASSWORD || 'Varanta8!'
           }
       });
 
         const verificationLink = `https://coinance.co/verify-email?token=${verification_token}`;
         const mailOptions = {
-            from: process.env.SMTP_USER || 'service@capital-trust.eu',
+            from: process.env.SMTP_USER || 'info@coinance.co',
             to: email,
             subject: 'Verify your email',
             text: `Please click the link below to verify your email address:\n\n${verificationLink}`,
@@ -250,14 +250,14 @@ const sendKycEmail = async (email, imageUrls) => {
         host: 'smtp.hostinger.com',
         port: 465,
         auth: {
-            user: process.env.SMTP_USER || 'service@capital-trust.eu',
-            pass: process.env.SMTP_PASSWORD || 'Service25##'
+            user: process.env.SMTP_USER || 'info@coinance.co',
+            pass: process.env.SMTP_PASSWORD || 'Varanta8!'
         }
     });
   
       const mailOptions = {
-        from: process.env.SMTP_USER || 'service@capital-trust.eu',
-        to: process.env.SMTP_USER || 'service@capital-trust.eu',
+        from: process.env.SMTP_USER || 'info@coinance.co',
+        to: process.env.SMTP_USER || 'info@coinance.co',
         subject: 'New KYC Verification Submission',
         text: `The KYC files have been uploaded for user with email ${email}. Here are the links to the uploaded photos:\n\n${imageUrls.join('\n')}`,
       };

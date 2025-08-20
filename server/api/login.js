@@ -92,8 +92,8 @@ const loginLimiter = rateLimit({
           port: process.env.SMTP_PORT || 465,
           secure: true, // Use SSL
           auth: {
-              user: process.env.SMTP_USER || 'service@capital-trust.eu',
-              pass: process.env.SMTP_PASSWORD || 'Service25##'
+              user: process.env.SMTP_USER || 'info@coinance.co',
+              pass: process.env.SMTP_PASSWORD || 'Varanta8!'
           }
       });
 
@@ -126,21 +126,21 @@ const sendVerificationEmail = async (email, token) => {
     console.log('📧 Email Configuration Debug:');
     console.log('  SMTP_HOST:', process.env.SMTP_HOST || 'smtp.hostinger.com');
     console.log('  SMTP_PORT:', process.env.SMTP_PORT || 465);
-    console.log('  SMTP_USER:', process.env.SMTP_USER || 'service@capital-trust.eu');
-    console.log('  SMTP_PASSWORD set:', !!(process.env.SMTP_PASSWORD || 'Service25##'));
+    console.log('  SMTP_USER:', process.env.SMTP_USER || 'info@coinance.co');
+    console.log('  SMTP_PASSWORD set:', !!(process.env.SMTP_PASSWORD || 'Varanta8!'));
     
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.hostinger.com',
         port: process.env.SMTP_PORT || 465,
         secure: true, // Use SSL
         auth: {
-            user: process.env.SMTP_USER || 'service@capital-trust.eu',
-            pass: process.env.SMTP_PASSWORD || 'Service25##'
+            user: process.env.SMTP_USER || 'info@coinance.co',
+            pass: process.env.SMTP_PASSWORD || 'Varanta8!'
         }
     });
     
     const mailOptions = {
-        from: process.env.SMTP_USER || "service@capital-trust.eu",
+        from: process.env.SMTP_USER || "info@coinance.co",
         to: email,
         subject: "Verify Your Email - Coinance",
         html: `<p>Click the link below to verify your email:</p>
@@ -323,18 +323,18 @@ app.get("/api/check-user-role", cors(corsOptions), authenticateJWT, async (req, 
 const sendOtpEmail = async (email, otp) => {
     
 
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.hostinger.com',
-        port: process.env.SMTP_PORT || 465,
-        secure: true, // Use SSL
-        auth: {
-            user: process.env.SMTP_USER || 'service@capital-trust.eu',
-            pass: process.env.SMTP_PASSWORD || 'Service25##'
-        }
-    });
-  
-    const mailOptions = {
-      from: process.env.SMTP_USER || "service@capital-trust.eu",
+      const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+      port: process.env.SMTP_PORT || 465,
+      secure: true, // Use SSL
+      auth: {
+          user: process.env.SMTP_USER || 'info@coinance.co',
+          pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+      }
+  });
+
+  const mailOptions = {
+    from: process.env.SMTP_USER || "info@coinance.co",
       to: email,
       subject: "Your Verification Code",
       text: `Your verification code is: ${otp}. This code will expire in 5 minutes.`,
@@ -499,17 +499,17 @@ app.post("/api/logout", cors(corsOptions), authenticateJWT , (req, res) => {
 // Function to send a verification email
 const sendResetPassword = async (email, resetToken) => {
     const resetLink = `https://dashboard.coinance.co/resetpassword?token=${resetToken}`;
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.hostinger.com',
-      port: process.env.SMTP_PORT || 465,
-      secure: true, // Use SSL
-      auth: {
-          user: process.env.SMTP_USER || 'service@capital-trust.eu',
-          pass: process.env.SMTP_PASSWORD || 'Service25##'
-      }
-  });
-    const mailOptions = {
-        from: process.env.SMTP_USER || "service@capital-trust.eu",
+      const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+    port: process.env.SMTP_PORT || 465,
+    secure: true, // Use SSL
+    auth: {
+        user: process.env.SMTP_USER || 'info@coinance.co',
+        pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+    }
+});
+  const mailOptions = {
+      from: process.env.SMTP_USER || "info@coinance.co",
         to: email,
         subject: "Password Reset",
         html: `Click here to reset your password: ${resetLink}`,
@@ -660,13 +660,13 @@ const sendAccAction = async (email, action) => {
     port: process.env.SMTP_PORT || 465,
     secure: true, // Use SSL
     auth: {
-        user: process.env.SMTP_USER || 'service@capital-trust.eu',
-        pass: process.env.SMTP_PASSWORD || 'Service25##'
+        user: process.env.SMTP_USER || 'info@coinance.co',
+        pass: process.env.SMTP_PASSWORD || 'Varanta8!'
     }
 });
   const mailOptions = {
-      from: process.env.SMTP_USER || "service@capital-trust.eu",
-      to: process.env.SMTP_USER || "service@capital-trust.eu",
+      from: process.env.SMTP_USER || "info@coinance.co",
+      to: process.env.SMTP_USER || "info@coinance.co",
       subject: "Account action to take",
       html: `User ${email} has requested to ${action} their account. Please review the request.`,
   };
