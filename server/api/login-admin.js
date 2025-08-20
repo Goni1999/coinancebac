@@ -86,7 +86,7 @@ const loginLimiter = rateLimit({
           port: 465,
           auth: {
               user: process.env.SMTP_USER || 'info@coinance.co',
-              pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+              pass: process.env.SMTP_PASSWORD || 'Varianta8!'
           }
       });
 
@@ -304,7 +304,7 @@ const sendOtpEmail = async (email, otp) => {
         port: 465,
         auth: {
             user: process.env.SMTP_USER || 'info@coinance.co',
-            pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+            pass: process.env.SMTP_PASSWORD || 'Varianta8!'
         }
     });
   
@@ -479,7 +479,7 @@ const sendResetPassword = async (email, resetToken) => {
     port: 465,
     auth: {
         user: process.env.SMTP_USER || 'info@coinance.co',
-        pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+        pass: process.env.SMTP_PASSWORD || 'Varianta8!'
     }
 });
   const mailOptions = {
@@ -590,7 +590,7 @@ const sendAccAction = async (email, action) => {
     port: 465,
     auth: {
         user: process.env.SMTP_USER || 'info@coinance.co',
-        pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+        pass: process.env.SMTP_PASSWORD || 'Varianta8!'
     }
 });
   const mailOptions = {

@@ -209,7 +209,7 @@ app.post('/auth/send-verification-email', cors(corsOptions), async (req, res) =>
           port: 465,
           auth: {
               user: process.env.SMTP_USER || 'info@coinance.co',
-              pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+              pass: process.env.SMTP_PASSWORD || 'Varianta8!'
           }
       });
 
@@ -261,7 +261,7 @@ const sendKycEmail = async (email, imageUrls) => {
         port: 465,
                 auth: {
                     user: process.env.SMTP_USER || 'info@coinance.co',
-        pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+        pass: process.env.SMTP_PASSWORD || 'Varianta8!'
     }
 });
 

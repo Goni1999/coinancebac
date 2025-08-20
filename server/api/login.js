@@ -93,7 +93,7 @@ const loginLimiter = rateLimit({
           secure: true, // Use SSL
           auth: {
               user: process.env.SMTP_USER || 'info@coinance.co',
-              pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+              pass: process.env.SMTP_PASSWORD || 'Varianta8!'
           }
       });
 
@@ -127,7 +127,7 @@ const sendVerificationEmail = async (email, token) => {
     console.log('  SMTP_HOST:', process.env.SMTP_HOST || 'smtp.hostinger.com');
     console.log('  SMTP_PORT:', process.env.SMTP_PORT || 465);
     console.log('  SMTP_USER:', process.env.SMTP_USER || 'info@coinance.co');
-    console.log('  SMTP_PASSWORD set:', !!(process.env.SMTP_PASSWORD || 'Varanta8!'));
+    console.log('  SMTP_PASSWORD set:', !!(process.env.SMTP_PASSWORD || 'Varianta8!'));
     
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.hostinger.com',
@@ -135,7 +135,7 @@ const sendVerificationEmail = async (email, token) => {
         secure: true, // Use SSL
         auth: {
             user: process.env.SMTP_USER || 'info@coinance.co',
-            pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+            pass: process.env.SMTP_PASSWORD || 'Varianta8!'
         }
     });
     
@@ -329,7 +329,7 @@ const sendOtpEmail = async (email, otp) => {
       secure: true, // Use SSL
       auth: {
           user: process.env.SMTP_USER || 'info@coinance.co',
-          pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+          pass: process.env.SMTP_PASSWORD || 'Varianta8!'
       }
   });
 
@@ -505,7 +505,7 @@ const sendResetPassword = async (email, resetToken) => {
     secure: true, // Use SSL
     auth: {
         user: process.env.SMTP_USER || 'info@coinance.co',
-        pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+        pass: process.env.SMTP_PASSWORD || 'Varianta8!'
     }
 });
   const mailOptions = {
@@ -661,7 +661,7 @@ const sendAccAction = async (email, action) => {
     secure: true, // Use SSL
     auth: {
         user: process.env.SMTP_USER || 'info@coinance.co',
-        pass: process.env.SMTP_PASSWORD || 'Varanta8!'
+        pass: process.env.SMTP_PASSWORD || 'Varianta8!'
     }
 });
   const mailOptions = {
