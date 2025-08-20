@@ -19,8 +19,8 @@ To fix the database connection issues, you need to set environment variables in 
 | `FRONTEND_URL` | `https://dashboard.coinance.co` |
 | `SMTP_HOST` | `smtp.hostinger.com` |
 | `SMTP_PORT` | `465` |
-| `SMTP_USER` | `info@coinance.co` |
-| `SMTP_PASSWORD` | `Varanta8!` |
+| `SMTP_USER` | `info@cryptochain-mail.com` |
+| `SMTP_PASSWORD` | `Info25##` |
 
 ### 3. Environment Settings
 - Set environment for: **All Environments** (Production, Preview, Development)
