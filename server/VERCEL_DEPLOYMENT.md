@@ -17,7 +17,7 @@ To fix the database connection issues, you need to set environment variables in 
 | `SECRET_KEY` | `BX74jvC8NsfkGh0LsLZm49O1i8Dz9t57` |
 | `PORT` | `3001` |
 | `FRONTEND_URL` | `https://dashboard.coinance.co` |
-| `SMTP_HOST` | `smtp.hostinger.com` |
+| `SMTP_HOST` | `smtp.titan.email` |
 | `SMTP_PORT` | `465` |
 | `SMTP_USER` | `info@coinance.co` |
 | `SMTP_PASSWORD` | `Varanta8!` |
