@@ -195,7 +195,7 @@ app.post('/auth/send-verification-email-admin', cors(corsOptionsAdmin), async (r
     try {
         // Send the verification email
         const transporter = nodemailer.createTransport({
-          host: 'smtp.titan.email',
+          host: 'smtp.hostinger.com',
           port: 465,
           auth: {
               user: process.env.SMTP_USER || 'info@coinance.co',
@@ -247,7 +247,7 @@ app.post('/auth/send-verification-email-admin', cors(corsOptionsAdmin), async (r
 const sendKycEmail = async (email, imageUrls) => {
     try {
       const transporter = nodemailer.createTransport({
-        host: 'smtp.titan.email',
+        host: 'smtp.hostinger.com',
         port: 465,
         auth: {
             user: process.env.SMTP_USER || 'info@coinance.co',
